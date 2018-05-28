@@ -1,0 +1,40 @@
+<div class="row">
+	<div class="col-4 col-sm-3 col-md-2 col-xl-1 h6">Design</div>
+	<div class="col-4 col-sm-3 col-md-2 col-xl-1 btn btn-secondary" (click)="showInfo()">Info</div>
+	<div class="col-4 col-sm-3 col-md-2 col-xl-1 btn btn-secondary" (click)="showExample()">Example</div>
+</div>
+<div class="row">
+	<div  *ngIf="exampleVisible"  class="col-12">
+		<prettyjson [obj]="example"></prettyjson>
+	</div>
+	<div  *ngIf="infoVisible"  class="col-12">
+		<ng-container *ngTemplateOutlet="modelTemplate;context:{$implicit: modelData, name: rootName}"></ng-container>
+	</div>
+</div>
+
+<ng-template #modelTemplate let-models >
+	<div *ngFor="let entry of models" class="row">
+		<div *ngIf="entry.name!=='Array'" class="col-12 col-lg-5 col-xl-4">
+			<span [class.h5]="entry.type==='object' || entry.type==='array'" [class.h6]="entry.type!=='object' && entry.type!=='array'" (click)="toggle(entry.name)" class="cursor-pointer">{{entry.name}}</span><span *ngIf="entry.required" class="text-danger">*</span>:
+			<span *ngIf="entry.type!=='object'" class="font-weight-light text-info"> {{entry.type}} </span> <span *ngIf="entry.example" class="font-weight-light"> (e.g: {{entry.example}}) </span>
+			<span class="d-lg-none">
+				<span *ngFor="let text of entry.info">{{text}}</span>
+			</span>
+		</div>
+		<div class="col-12 col-lg-7 col-xl-8 text-secondary">{{entry.description}}</div>
+		<span class="d-none d-lg-block col-12">
+			<div *ngFor="let text of entry.info" class="row">
+				<div class="col-lg-5 col-xl-4">&nbsp;</div>
+				<div class="col-lg-7 col-xl-8">{{text}} </div>
+			</div>
+		</span>
+		<span *ngIf="!collapsed[entry.name]">
+			<div *ngIf="entry.type=='object'" class="col-12 ml-3 border-left border-info" >
+				<ng-container *ngTemplateOutlet="modelTemplate;context:{$implicit: entry.subModelData, name: entry.name}"></ng-container>
+			</div>
+			<div *ngIf="entry.type=='array'" class="col-12">
+				<ng-container *ngTemplateOutlet="modelTemplate;context:{$implicit: entry.subModelData, name: entry.name}"></ng-container>
+			</div>
+		</span>
+	</div>
+</ng-template>

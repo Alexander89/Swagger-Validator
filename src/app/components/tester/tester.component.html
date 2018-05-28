@@ -1,0 +1,66 @@
+<p>
+  URL link status: {{status}}
+</p>
+<div class="container">
+	<div class="row jumbotron">
+		<div class="row">
+			<div *ngIf="swagger.def?.info" class="col-lg-7">
+				<div class="card border-info">
+					<div class="card-header">
+						{{swagger.def?.info.title}} <sup><span class="badge badge-info">{{swagger.def?.info.version}}</span></sup>
+					</div>
+					<div id="collapseInfo" class="collapse show">
+						<div class="card-block mx-2">
+							<p [innerHtml]="swagger.def?.info.description"></p>
+							<a *ngIf="swagger.def?.info.contact" [href]="'mailto:' + swagger.def?.info.contact.email" >{{swagger.def?.info.contact.email}}</a>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div *ngIf="swagger.def" class="col-lg-5">
+				<div class="card border-info">
+					<div class="card-header">
+							Swagger
+					</div>
+					<div id="collapseInfo" class="collapse show">
+						<div class="mt-2">
+							<div class="card-block mx-2">
+								Version: {{swagger.def.swagger}}
+								<div class="form-group">
+									<label for="host">Host:</label>
+									<input type="text" name="host" id="host" class="form-control" [(ngModel)]="swagger.def.host">
+								</div>
+								<div class="form-group">
+									<label for="host">BasePath:</label>
+									<input type="text" name="basePath" id="basePath" class="form-control" [(ngModel)]="swagger.def.basePath">
+								</div>
+								<div class="form-group">
+									<label for="schemes">schemes:</label>
+									<select name="schemes" class="form-control" id="schemes" [(ngModel)]="selectedScheme">
+										<option *ngFor="let scheme of swagger.def.schemes" [value]="scheme">{{scheme}}</option>
+										<option value="">-- other --</option>
+										<option value="http">http</option>
+										<option value="https">https</option>
+										<option value="ssh">ssh</option>
+										<option value="ftp">ftp</option>
+										<option value="ftps">ftps</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div *ngIf="swagger.def">
+		<div *ngFor="let tag of swagger.def.tags; trackBy: trackTag" >
+			<h1>{{tag.name}}</h1><small>{{tag.description}}</small>
+			<div *ngFor="let path of pathArray; trackBy: trackCall">
+				<div *ngFor="let method of path.methods; trackBy: trackMeth">
+					<app-call *ngIf="method.call.tags.indexOf(tag.name) > -1" [call]="method.call" [callName]="path.callName" [method]="method.method"></app-call>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,31 @@
+{
+	"compileOnSave": false,
+	"compilerOptions": {
+		"outDir": "./dist/out-tsc",
+		"sourceMap": true,
+		"declaration": false,
+		"moduleResolution": "node",
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"target": "es6",
+		"typeRoots": [
+			"node_modules/@types"
+		],
+		"lib": [
+			"es2017",
+			"dom"
+		],
+		"baseUrl": "src",
+		"paths": {
+			"@app/*": ["app/*"],
+			"@swagger/*": ["app/models/swagger/*"],
+			"@env/*": ["environments/*"],
+			"@comp/*": ["app/components/*"],
+			"@models/*": ["api/models/*"],
+			"@services/*": ["app/services/*"],
+			"@pipes/*": ["app/pipes/*"],
+			"@directives/*": ["app/directives/*"],
+			"@test/*": ["testing/*"]
+		}
+	}
+}
