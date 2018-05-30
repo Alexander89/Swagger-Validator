@@ -25,7 +25,6 @@
 			"@services/*": ["app/services/*"],
 			"@pipes/*": ["app/pipes/*"],
 			"@directives/*": ["app/directives/*"],
-			"@test/*": ["testing/*"]
 		}
 	}
 }
