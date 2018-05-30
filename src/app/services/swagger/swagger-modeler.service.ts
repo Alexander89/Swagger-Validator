@@ -23,7 +23,6 @@ export class SwaggerModeler {
 	}
 
 	private createExampleForSchema(schema: S.Schema): any {
-
 		switch (schema.type) {
 			case 'boolean':
 				return schema.example ? !!schema.example : true;
@@ -45,8 +44,6 @@ export class SwaggerModeler {
 		}
 		return null;
 	}
-
-
 
 	public createInfo(modelName: string): ModelInfo {
 		const resolvedDef = SwaggerValidator.resolveRef(this.swagger.def);

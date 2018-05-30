@@ -1,13 +1,15 @@
 <div class="row">
-	<div class="col-4 col-sm-3 col-md-2 col-xl-1 h6">Design</div>
-	<div class="col-4 col-sm-3 col-md-2 col-xl-1 btn btn-secondary" (click)="showInfo()">Info</div>
-	<div class="col-4 col-sm-3 col-md-2 col-xl-1 btn btn-secondary" (click)="showExample()">Example</div>
+	<div class="col-12">
+		<span class="h6">Response as:</span>
+		<span class="btn-link" (click)="showInfo()">Model</span>
+		<span class="btn-link" (click)="showExample()">Example</span>
+	</div>
 </div>
-<div class="row">
-	<div  *ngIf="exampleVisible"  class="col-12">
+<div class="row border border-info rounded py-2">
+	<div  *ngIf="exampleVisible" class="col-12">
 		<prettyjson [obj]="example"></prettyjson>
 	</div>
-	<div  *ngIf="infoVisible"  class="col-12">
+	<div *ngIf="infoVisible" class="col-12">
 		<ng-container *ngTemplateOutlet="modelTemplate;context:{$implicit: modelData, name: rootName}"></ng-container>
 	</div>
 </div>
@@ -29,8 +31,10 @@
 			</div>
 		</span>
 		<span *ngIf="!collapsed[entry.name]">
-			<div *ngIf="entry.type=='object'" class="col-12 ml-3 border-left border-info" >
-				<ng-container *ngTemplateOutlet="modelTemplate;context:{$implicit: entry.subModelData, name: entry.name}"></ng-container>
+			<div *ngIf="entry.type=='object'" class="col-12 pl-3" >
+				<div class="d-block border-left border-top border-gray pl-3">
+					<ng-container *ngTemplateOutlet="modelTemplate;context:{$implicit: entry.subModelData, name: entry.name}"></ng-container>
+				</div>
 			</div>
 			<div *ngIf="entry.type=='array'" class="col-12">
 				<ng-container *ngTemplateOutlet="modelTemplate;context:{$implicit: entry.subModelData, name: entry.name}"></ng-container>
