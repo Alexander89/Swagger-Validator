@@ -1,14 +1,17 @@
 <!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-	<h1>
-		Welcome to {{ title }}!
-	</h1>
-	<div class="form-group row">
-		<label for="source" class="col-2 col-form-label">Source: </label>
-		<div class="col-10">
+<div class="container mt-3">
+	<div class="row">
+		<div class="col-12">
+			<h2>{{title}}</h2>
+		</div>
+
+		<div class="col-12 ">
+			<label for="source" class="form-label">Source: </label>
+		</div>
+		<div class="col-12">
 			<input type="text" name="source" id="source" class="form-control" [(ngModel)]="source">
 		</div>
-	</div>
+</div>
 </div>
 <app-tester [source]="source"></app-tester>
 

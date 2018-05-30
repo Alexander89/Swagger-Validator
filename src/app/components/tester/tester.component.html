@@ -1,4 +1,4 @@
-<p>
+<p class="container">
   URL link status: {{status}}
 </p>
 <div class="container">
@@ -54,7 +54,7 @@
 		</div>
 	</div>
 	<div *ngIf="swagger.def">
-		<div *ngFor="let tag of swagger.def.tags; trackBy: trackTag" >
+		<div *ngFor="let tag of swagger.def.tags; trackBy: trackTag" class="mb-5">
 			<h1>{{tag.name}}</h1><small>{{tag.description}}</small>
 			<div *ngFor="let path of pathArray; trackBy: trackCall">
 				<div *ngFor="let method of path.methods; trackBy: trackMeth">
