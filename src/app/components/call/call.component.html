@@ -37,7 +37,6 @@
 				<div class="col-md-10">
 					{{call?.description}}
 				</div>
-				<hr class="m-y-1">
 			</div>
 			<div *ngIf="call?.operationId" class="row">
 				<div class="col-md-2">
@@ -45,88 +44,89 @@
 						OperationId
 					</strong>
 				</div>
-				<div class="col-md-8">
+				<div class="col-md-10">
 					{{call?.operationId}}(
 						<span *ngFor="let param of call?.parameters; let i = index">
 							<span *ngIf="i>0">, </span>{{param.name}}: <strong class="text-info">{{extractType(param)}}</strong><span *ngIf="param.default">= <span *ngIf="param.type==='string'">'</span>{{param.default}}<span *ngIf="param.type==='string'">'</span></span>
 						</span>
 					) <span *ngIf="returnValue">: <strong class="text-info">{{returnValue}}</strong></span>
 				</div>
-				<div class="col-md-2">
+			</div>
+		</li>
+		<li class="list-group-item px-0 px-md-3">
+			<div class="card mb-2">
+				<div class="card-header cursor-pointer" (click)="toggleDetails()">
+					Reply details
+					<ng-container *ngIf="details"> (Close)</ng-container>
+				</div>
+				<div *ngIf="details"  class="card-body">
+					<app-example *ngIf="call.responses[200]" [schema]="call.responses[200].schema" title="200: {{call.responses[200].description}}" class="mb-3"></app-example>
+					<div *ngFor="let response of responses; trackBy: trackResponse" class="row mb-3">
+						<ng-container *ngIf="response !== '200'">
+							<strong class="col-sm-2 col-lg-1">{{response}}:</strong>
+							<div *ngIf="!call.responses[response].schema" class="col-sm-10 col-lg-11">{{call.responses[response].description}}</div>
+							<app-example *ngIf="call.responses[response].schema" mode="example" title="{{call.responses[response].description}}" [schema]="call.responses[response].schema" class="col-sm-10 col-lg-11"></app-example>
+						</ng-container>
+					</div>
+				</div>
+			</div>
+			<div class="card">
+				<div class="card-header cursor-pointer" (click)="toggleShowCall()">
+					Parameter / Try-it
+					<ng-container *ngIf="tryItOut"> (Close)</ng-container>
+				</div>
+				<div *ngIf="tryItOut"  class="card-body">
+					<div *ngFor="let param of call?.parameters; let i = index" class="mb-4">
+						<div class="row">
+							<div class="col-sm-3 col-lg-2">
+								{{param.name}}<span *ngIf="param.required" class="text-danger">*</span>
+							</div>
+							<div *ngIf="param.in!=='body'" class="col-sm-7 col-lg-8">
+								<input type="text" name="value" id="value" class="form-control" (blur)="setNewValue(param.name, $event)" [value]="call?.values[param.name]">
+							</div>
+							<div *ngIf="param.in==='body'" class="col-sm-7 col-lg-8">
+									<textarea name="value" id="value" class="form-control" style="min-height:10rem" (blur)="setNewValue(param.name, $event)" [value]="call?.values[param.name]"> </textarea>
+								</div>
+							<div class="col-sm-2">
+								: {{extractType(param)}}
+							</div>
+						</div>
+						<div class="row">
+							<div *ngIf="param.in" class="col-2">
+								<i>{{param.in}}</i>
+							</div>
+							<div *ngIf="param.description" class="col-10">
+								{{param.description}}
+							</div>
+						</div>
+						<div *ngIf="param.in==='body'" class="row">
+							<div class="col-2"></div>
+							<div class="col-10">
+								<app-example [schema]="getParamSchem(param)"></app-example>
+								<div (click)="useExampleOnBody()" class="btn btn-secondary">
+									use Example
+								</div>
+							</div>
+						</div>
+					</div>
 					<div class="row">
-						<div class="btn btn-secondary col-6 col-md-12 col-lg-6" (click)="toggleDetails()">Details</div>
-						<div class="btn btn-secondary col-6 col-md-12 col-lg-6" (click)="toggleShowCall()">
-							<ng-container *ngIf="!tryItOut">Try-it</ng-container>
-							<ng-container *ngIf="tryItOut">Close</ng-container>
+						<div class="col-sm-6">
+						</div>
+						<div class="col-6 col-sm-3">
+							<div class="btn btn-secondary btn-block" (click)="resetRequest()">
+								reset
+							</div>
+						</div>
+						<div class="col-6 col-sm-3">
+							<div class="btn btn-primary btn-block" (click)="request()">
+								send
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</li>
-		<li *ngIf="details" class="list-group-item">
-			<app-example *ngIf="call.responses[200]" [schema]="call.responses[200].schema" title="200: {{call.responses[200].description}}" class="mb-3"></app-example>
-			<div *ngFor="let response of responses; trackBy: trackResponse" class="row mb-3">
-				<ng-container *ngIf="response !== '200'">
-					<strong class="col-sm-2 col-lg-1">{{response}}:</strong>
-					<div *ngIf="!call.responses[response].schema" class="col-sm-10 col-lg-11">{{call.responses[response].description}}</div>
-					<app-example *ngIf="call.responses[response].schema" mode="example" title="{{call.responses[response].description}}" [schema]="call.responses[response].schema" class="col-sm-10 col-lg-11"></app-example>
-					<ng-container></ng-container>
-				</ng-container>
-			</div>
-		</li>
-		<li *ngIf="tryItOut" class="list-group-item">
-			<div *ngFor="let param of call?.parameters; let i = index" class="mb-4">
-				<div class="row">
-					<div class="col-4 col-lg-2">
-						{{param.name}}
-					</div>
-					<div *ngIf="param.in!=='body'" class="col-8 col-lg-6">
-						<input type="text" name="value" id="value" class="form-control" (blur)="setNewValue(param.name, $event)" [value]="call?.values[param.name]">
-					</div>
-					<div *ngIf="param.in==='body'" class="col-8 col-lg-6">
-							<textarea  name="value" id="value" class="form-control" (blur)="setNewValue(param.name, $event)" [value]="call?.values[param.name]"> </textarea>
-						</div>
-					<div *ngIf="param.required" class="col-4 col-lg-2">
-						required
-					</div>
-					<div class="col-8 col-lg-2">
-						as {{extractType(param)}}
-					</div>
-				</div>
-				<div class="row">
-					<div *ngIf="param.in" class="col-2">
-						<i>{{param.in}}</i>
-					</div>
-					<div *ngIf="param.description" class="col-10">
-						{{param.description}}
-					</div>
-				</div>
-				<div *ngIf="param.in==='body'" class="row">
-					<div class="col-2"></div>
-					<div class="col-10">
-						<app-example [schema]="getParamSchem(param)"></app-example>
-						<div (click)="useExampleOnBody()" class="btn btn-secondary">
-							use Example
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-6">
-				</div>
-				<div class="col-6 col-sm-3">
-					<div class="btn btn-secondary btn-block" (click)="resetRequest()">
-						reset
-					</div>
-				</div>
-				<div class="col-6 col-sm-3">
-					<div class="btn btn-primary btn-block" (click)="request()">
-						send
-					</div>
-				</div>
-			</div>
-		</li>
-		<li *ngIf="showResult" class="list-group-item">
+		<li *ngIf="showResult" class="list-group-item px-0 px-md-3">
 			<div class="row">
 				<div class="col-sm-2 col-form-label">Status:</div>
 				<div class="col-sm-10">{{status}}</div>
