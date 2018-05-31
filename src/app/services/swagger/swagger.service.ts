@@ -164,9 +164,8 @@ export class Swagger {
 		});
 	}
 	protected sendRequest(call: S.Call, req: any): Observable<any> {
-		let headers = req.header;
-		headers = headers.set('Access-Control-Allow-Origin', '*');
-		headers = headers.set('Accept', ['application/json']);
+		const headers = req.header;
+		headers.append('Access-Control-Allow-Origin', '*');
 
 		switch (call.method) {
 			case 'get':
