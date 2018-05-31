@@ -1,6 +1,6 @@
 import * as S from '@swagger/swagger';
 import { Injectable } from '@angular/core';
-import { Swagger, SwaggerValidator } from '@services/swagger';
+import { Swagger } from '@services/swagger/swagger.service';
 
 export interface ModelInfo {
 	name: string;
@@ -18,8 +18,10 @@ export class SwaggerModeler {
 	constructor(private swagger: Swagger) {}
 
 	public createExample(modelName: string): string {
-		const resolvedDef = SwaggerValidator.resolveRef(this.swagger.def);
-		return JSON.stringify(this.createExampleForSchema(resolvedDef.definitions[modelName]), null, 4);
+		return JSON.stringify(this.createExampleForSchema(this.swagger.def.definitions[modelName]), null, 4);
+	}
+	public createExampleBySchema(schema: S.Schema): string {
+		return JSON.stringify(this.createExampleForSchema(schema), null, 4);
 	}
 
 	private createExampleForSchema(schema: S.Schema): any {
@@ -46,9 +48,11 @@ export class SwaggerModeler {
 	}
 
 	public createInfo(modelName: string): ModelInfo {
-		const resolvedDef = SwaggerValidator.resolveRef(this.swagger.def);
-		const schema = resolvedDef.definitions[modelName];
+		const schema = this.swagger.def.definitions[modelName];
 		return this.createInfoForSchema(modelName, false, schema);
+	}
+	public createInfoBySchema(schema: S.Schema): ModelInfo {
+		return this.createInfoForSchema(schema.name, false, schema);
 	}
 
 	private createInfoForSchema(name: string, required: boolean, schema: S.Schema): any {

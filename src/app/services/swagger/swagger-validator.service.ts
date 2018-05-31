@@ -18,70 +18,6 @@ export class SwaggerValidator {
 
 	constructor(private swagger: Swagger) {}
 
-	public static resolveRef(def: S.Root): S.Root {
-		let strDef = JSON.stringify(def);
-		const replaced = new Array<string>(); // for cycle detection
-
-		// helper functions
-		const trimObj = (json: string): string => {
-			if (json.length < 2) {
-				return '';
-			}
-			return json.substr(1, json.length - 2);
-		};
-		const getModelAsString = (name: string): string => {
-			const model = def.definitions[name];
-			if (!model) {
-				throw new ReferenceError(`ref to undefined Model ${name}`);
-			}
-			return trimObj(JSON.stringify(model));
-		};
-		const getResponseAsString = (name: string): string => {
-			const response = def.responses[name];
-			if (!response) {
-				throw new ReferenceError(`ref to undefined Responses ${name}`);
-			}
-			return trimObj(JSON.stringify(response));
-		};
-		const replaceAll = (placeHolder: string, replace: string): void => {
-			if (replaced.indexOf(placeHolder) !== -1) {
-				throw new SyntaxError(`STOP! A ref cycle is detected in ${placeHolder}`);
-			}
-			while (true) {
-				if (strDef.indexOf(placeHolder) === -1) {
-					return;
-				}
-				strDef = strDef.replace(placeHolder, replace);
-			}
-		};
-
-		// task to replace $ref
-		while (true) {
-			const refPos = strDef.indexOf('"$ref"');
-			if (refPos === -1) {
-				break;
-			}
-			// fix positions in ref string
-			const defPos = strDef.indexOf('#', refPos) + 2;
-			const slashPos = strDef.indexOf('/', defPos);
-			const modelPos = slashPos + 1;
-			const endPos = strDef.indexOf('"', slashPos);
-
-			// extract strings
-			const refType = strDef.substr(defPos, slashPos - defPos);
-			const name = strDef.substr(modelPos, endPos - modelPos);
-			const fullRefString = strDef.substr(refPos, endPos + 1 - refPos); // +1 for the last "
-
-			// replace with Model or response
-			if (refType === 'definitions') {
-				replaceAll(fullRefString, getModelAsString(name));
-			} else if (refType === 'responses') {
-				replaceAll(fullRefString, getResponseAsString(name));
-			}
-		}
-		return JSON.parse(strDef);
-	}
-
 	public validateReply(call: S.Call, reply: string | any): ValidationError | undefined {
 		if (reply.indexOf('{') === -1) {
 			return { status: 'invalid reply', errors: [{model: this.actualSchema, error: 'reply is not a JSON'}] };
@@ -96,7 +32,7 @@ export class SwaggerValidator {
 			return { status: 'invalid reply', errors: [{model: this.actualSchema, error: 'return type not specified'}] };
 		}
 
-		this.resolvedDev = SwaggerValidator.resolveRef(this.swagger.def);
+		this.resolvedDev = Swagger.resolveRef(this.swagger.def);
 
 		const type = this.resolvedDev.definitions[returnType];
 		return this.validateSchema(type, reply);

@@ -1,7 +1,7 @@
 import * as S from '@swagger/swagger';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 
 @Injectable()
 export class Swagger {
@@ -10,42 +10,113 @@ export class Swagger {
 
 	constructor(protected httpClient: HttpClient) {}
 
+
+	public static resolveRef(def: S.Root): S.Root {
+		let strDef = JSON.stringify(def);
+		const replaced = new Array<string>(); // for cycle detection
+
+		// helper functions
+		const trimObj = (json: string): string => {
+			if (json.length < 2) {
+				return '';
+			}
+			return json.substr(1, json.length - 2);
+		};
+		const getModelAsString = (name: string): string => {
+			const model = def.definitions[name];
+			if (!model) {
+				throw new ReferenceError(`ref to undefined Model ${name}`);
+			}
+			return trimObj(JSON.stringify(model));
+		};
+		const getResponseAsString = (name: string): string => {
+			const response = def.responses[name];
+			if (!response) {
+				throw new ReferenceError(`ref to undefined Responses ${name}`);
+			}
+			return trimObj(JSON.stringify(response));
+		};
+		const replaceAll = (placeHolder: string, replace: string): void => {
+			if (replaced.indexOf(placeHolder) !== -1) {
+				throw new SyntaxError(`STOP! A ref cycle is detected in ${placeHolder}`);
+			}
+			while (true) {
+				if (strDef.indexOf(placeHolder) === -1) {
+					return;
+				}
+				strDef = strDef.replace(placeHolder, replace);
+			}
+		};
+
+		// task to replace $ref
+		while (true) {
+			const refPos = strDef.indexOf('"$ref"');
+			if (refPos === -1) {
+				break;
+			}
+			// fix positions in ref string
+			const defPos = strDef.indexOf('#', refPos) + 2;
+			const slashPos = strDef.indexOf('/', defPos);
+			const modelPos = slashPos + 1;
+			const endPos = strDef.indexOf('"', slashPos);
+
+			// extract strings
+			const refType = strDef.substr(defPos, slashPos - defPos);
+			const name = strDef.substr(modelPos, endPos - modelPos);
+			const fullRefString = strDef.substr(refPos, endPos + 1 - refPos); // +1 for the last "
+
+			// replace with Model or response
+			if (refType === 'definitions') {
+				replaceAll(fullRefString, getModelAsString(name));
+			} else if (refType === 'responses') {
+				replaceAll(fullRefString, getResponseAsString(name));
+			}
+		}
+		return JSON.parse(strDef);
+	}
+
 	public static splitRef(ref: string): string {
 		const split = ref.lastIndexOf('/') + 1;
 		return ref.substr(split);
 	}
 	public static extractType(param: S.Parameter): string {
 		if (param.in === 'body') {
-			if (param.schema && param.schema.$ref) {
-				return Swagger.splitRef(param.schema.$ref);
+			if (param.schema && param.schema.name) {
+				return param.schema.name;
 			}
 		}
 		return param.type;
 	}
 	public static extractReturnType(call: S.Call): string | undefined {
-		if (!call.responses || !call.responses[200] || !call.responses[200].schema || !call.responses[200].schema.$ref) {
+		if (!call.responses || !call.responses[200] || !call.responses[200].schema) {
 			return undefined;
 		}
-		return splitRef(call.responses[200].schema.$ref);
+		return splitRef(call.responses[200].refName);
 	}
 
 	get def() { return this._def; }
 	set def(value: S.Root) {
 		this._def = value;
-		if (value !== undefined && value.paths) {
+		if (this._def !== undefined && this._def.paths) {
 			// add callName and method to the call
+			Object.getOwnPropertyNames(this._def.definitions).forEach(model => this._def.definitions[model].name = model);
+
 			this.pathArray.forEach(callGroup => {
 				callGroup.methods.forEach(method => {
 					method.call.callName = callGroup.callName;
 					method.call.method = method.method;
 					method.call.values = {};
-					method.call.parameters.forEach(p => {
-						if (!method.call.values[p.name]) {
-							method.call.values[p.name] = p.default || '';
+					method.call.parameters.forEach(p => method.call.values[p.name] = p.default || '');
+					Object.getOwnPropertyNames(method.call.responses).forEach(r => {
+						if (method.call.responses[r].schema && method.call.responses[r].schema.$ref) {
+							method.call.responses[r].refName = method.call.responses[r].schema.$ref;
+						} else {
+							method.call.responses[r].refName = method.call.responses[r].schema ? 'inline' : '';
 						}
 					});
 				});
 			});
+			this._def = Swagger.resolveRef(this._def);
 		}
 	}
 
@@ -88,7 +159,7 @@ export class Swagger {
 				ob.next(JSON.stringify(res));
 				ob.complete();
 			}, e => {
-				ob.error(JSON.stringify(e));
+				ob.error({error: JSON.stringify(e), status: e.status});
 			});
 		});
 	}

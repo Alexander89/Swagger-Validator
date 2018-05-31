@@ -1,7 +1,7 @@
-<p class="container">
+<p class="container-fluid">
   URL link status: {{status}}
 </p>
-<div class="container">
+<div class="container-fluid">
 	<div class="row jumbotron">
 		<div class="row">
 			<div *ngIf="swagger.def?.info" class="col-lg-7">
@@ -53,14 +53,14 @@
 			</div>
 		</div>
 	</div>
-	<div *ngIf="swagger.def">
-		<div *ngFor="let tag of swagger.def.tags; trackBy: trackTag" class="mb-5">
+	<ng-container *ngIf="swagger.def">
+		<div *ngFor="let tag of swagger.def.tags; trackBy: trackTag" class="mb-5 ml-1">
 			<h1>{{tag.name}}</h1><small>{{tag.description}}</small>
-			<div *ngFor="let path of pathArray; trackBy: trackCall">
-				<div *ngFor="let method of path.methods; trackBy: trackMeth">
+			<ng-container *ngFor="let path of pathArray; trackBy: trackCall">
+				<ng-container *ngFor="let method of path.methods; trackBy: trackMeth">
 					<app-call *ngIf="method.call.tags.indexOf(tag.name) > -1" [call]="method.call" [callName]="path.callName" [method]="method.method"></app-call>
-				</div>
-			</div>
+				</ng-container>
+			</ng-container>
 		</div>
-	</div>
+	</ng-container>
 </div>

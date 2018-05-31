@@ -26,139 +26,147 @@
 			</div>
 		</div>
 	</div>
-	<div *ngIf="!collapsed" class="card-body">
-		<div *ngIf="call?.description" class="row">
-			<div class="col-md-2">
-				<strong>
-					Description:
-				</strong>
+	<ul *ngIf="!collapsed" class="list-group list-group-flush">
+		<li class="list-group-item">
+			<div *ngIf="call?.description" class="row">
+				<div class="col-md-2">
+					<strong>
+						Description
+					</strong>
+				</div>
+				<div class="col-md-10">
+					{{call?.description}}
+				</div>
+				<hr class="m-y-1">
 			</div>
-			<div class="col-md-10">
-				{{call?.description}}
+			<div *ngIf="call?.operationId" class="row">
+				<div class="col-md-2">
+					<strong>
+						OperationId
+					</strong>
+				</div>
+				<div class="col-md-8">
+					{{call?.operationId}}(
+						<span *ngFor="let param of call?.parameters; let i = index">
+							<span *ngIf="i>0">, </span>{{param.name}}: <strong class="text-info">{{extractType(param)}}</strong><span *ngIf="param.default">= <span *ngIf="param.type==='string'">'</span>{{param.default}}<span *ngIf="param.type==='string'">'</span></span>
+						</span>
+					) <span *ngIf="returnValue">: <strong class="text-info">{{returnValue}}</strong></span>
+				</div>
+				<div class="col-md-2">
+					<div class="row">
+						<div class="btn btn-secondary col-6 col-md-12 col-lg-6" (click)="toggleDetails()">Details</div>
+						<div class="btn btn-secondary col-6 col-md-12 col-lg-6" (click)="toggleShowCall()">
+							<ng-container *ngIf="!tryItOut">Try-it</ng-container>
+							<ng-container *ngIf="tryItOut">Close</ng-container>
+						</div>
+					</div>
+				</div>
 			</div>
-			<hr class="m-y-1">
-		</div>
-		<div *ngIf="call?.operationId" class="row">
-			<div class="col-md-2">
-				<strong>
-					API-OperationId:
-				</strong>
+		</li>
+		<li *ngIf="details" class="list-group-item">
+			<app-example *ngIf="call.responses[200]" [schema]="call.responses[200].schema" title="200: {{call.responses[200].description}}" class="mb-3"></app-example>
+			<div *ngFor="let response of responses; trackBy: trackResponse" class="row mb-3">
+				<ng-container *ngIf="response !== '200'">
+					<strong class="col-sm-2 col-lg-1">{{response}}:</strong>
+					<div *ngIf="!call.responses[response].schema" class="col-sm-10 col-lg-11">{{call.responses[response].description}}</div>
+					<app-example *ngIf="call.responses[response].schema" mode="example" title="{{call.responses[response].description}}" [schema]="call.responses[response].schema" class="col-sm-10 col-lg-11"></app-example>
+					<ng-container></ng-container>
+				</ng-container>
 			</div>
-			<div class="col-md-8">
-				{{call?.operationId}}(
-					<span *ngFor="let param of call?.parameters; let i = index">
-						<span *ngIf="i>0">, </span>{{param.name}}: <strong class="text-info">{{extractType(param)}}</strong><span *ngIf="param.default">= <span *ngIf="param.type==='string'">'</span>{{param.default}}<span *ngIf="param.type==='string'">'</span></span>
-					</span>
-				) <span *ngIf="returnValue">: <strong class="text-info">{{returnValue}}</strong></span>
-			</div>
-			<div class="col-md-2">
+		</li>
+		<li *ngIf="tryItOut" class="list-group-item">
+			<div *ngFor="let param of call?.parameters; let i = index" class="mb-4">
 				<div class="row">
-					<div class="btn btn-secondary col-6 col-md-12 col-lg-6" (click)="toggleDetails()">Details</div>
-					<div class="btn btn-secondary col-6 col-md-12 col-lg-6" (click)="toggleShowCall()">
-						<ng-container *ngIf="!tryItOut">Try-it</ng-container>
-						<ng-container *ngIf="tryItOut">Close</ng-container>
+					<div class="col-4 col-lg-2">
+						{{param.name}}
 					</div>
-			</div>
-		</div>
-	</div>
-	<div *ngIf="details" class="col-12">
-		<hr class="border-info">
-		<app-example [call]="call"></app-example>
-	</div>
-	<div *ngIf="tryItOut" class="col-12">
-		<hr class="border-info">
-		<div *ngFor="let param of call?.parameters; let i = index" class="mb-4">
-			<div class="row">
-				<div class="col-4 col-lg-2">
-					{{param.name}}
-				</div>
-				<div *ngIf="param.in!=='body'" class="col-8 col-lg-6">
-					<input type="text" name="value" id="value" class="form-control" (blur)="setNewValue(param.name, $event)" [value]="call?.values[param.name]">
-				</div>
-				<div *ngIf="param.in==='body'" class="col-8 col-lg-6">
-						<textarea  name="value" id="value" class="form-control" (blur)="setNewValue(param.name, $event)" [value]="call?.values[param.name]"> </textarea>
+					<div *ngIf="param.in!=='body'" class="col-8 col-lg-6">
+						<input type="text" name="value" id="value" class="form-control" (blur)="setNewValue(param.name, $event)" [value]="call?.values[param.name]">
 					</div>
-				<div *ngIf="param.required" class="col-4 col-lg-2">
-					required
-				</div>
-				<div class="col-8 col-lg-2">
-					as {{extractType(param)}}
-				</div>
-			</div>
-			<div class="row">
-				<div *ngIf="param.in" class="col-2">
-					<i>{{param.in}}</i>
-				</div>
-				<div *ngIf="param.description" class="col-10">
-					{{param.description}}
-				</div>
-			</div>
-			<div *ngIf="param.in==='body'" class="row">
-				<div class="col-2"></div>
-				<div class="col-10">
-					<app-example [type]="extractType(param)"></app-example>
-					<div (click)="useExampleOnBody()" class="btn btn-secondary">
-						use Example
+					<div *ngIf="param.in==='body'" class="col-8 col-lg-6">
+							<textarea  name="value" id="value" class="form-control" (blur)="setNewValue(param.name, $event)" [value]="call?.values[param.name]"> </textarea>
+						</div>
+					<div *ngIf="param.required" class="col-4 col-lg-2">
+						required
+					</div>
+					<div class="col-8 col-lg-2">
+						as {{extractType(param)}}
 					</div>
 				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-6">
-			</div>
-			<div class="col-6 col-sm-3">
-				<div class="btn btn-secondary btn-block" (click)="resetRequest()">
-					reset
-				</div>
-			</div>
-			<div class="col-6 col-sm-3">
-				<div class="btn btn-primary btn-block" (click)="request()">
-					send
-				</div>
-			</div>
-		</div>
-	</div>
-	<div *ngIf="showResult" class="card-body col-12">
-		<hr class="border-info">
-		<div class="row">
-			<div class="col-2">status:</div>
-			<div class="col-10">{{status}}</div>
-		</div>
-		<div *ngIf="error" class="row">
-			<div *ngIf="errorArray?.length" class="col-12 col-lg-5">
 				<div class="row">
-					<div class="col-sm-3">Errors:</div>
-					<div class="col-sm-9 text-danger">
-						<div *ngFor="let error of errorArray">{{error}}</div>
+					<div *ngIf="param.in" class="col-2">
+						<i>{{param.in}}</i>
+					</div>
+					<div *ngIf="param.description" class="col-10">
+						{{param.description}}
+					</div>
+				</div>
+				<div *ngIf="param.in==='body'" class="row">
+					<div class="col-2"></div>
+					<div class="col-10">
+						<app-example [schema]="getParamSchem(param)"></app-example>
+						<div (click)="useExampleOnBody()" class="btn btn-secondary">
+							use Example
+						</div>
 					</div>
 				</div>
 			</div>
-			<div *ngIf="errorArray?.length" class="col-12 col-lg-7">
-				<div class="row">
-					<div class="col-sm-3">Response:</div>
-					<div *ngIf="!showFullOutput" class="col-sm-9 cursor-pointer" (click)="toggleFullOutput()">{{error | Cut:80}}</div>
-					<div *ngIf="showFullOutput" class="col-12 col-md-9 cursor-pointer" (click)="toggleFullOutput()"><prettyjson [obj]="niceError"></prettyjson></div>
+			<div class="row">
+				<div class="col-sm-6">
+				</div>
+				<div class="col-6 col-sm-3">
+					<div class="btn btn-secondary btn-block" (click)="resetRequest()">
+						reset
+					</div>
+				</div>
+				<div class="col-6 col-sm-3">
+					<div class="btn btn-primary btn-block" (click)="request()">
+						send
+					</div>
 				</div>
 			</div>
-		</div>
-		<div *ngIf="result" class="row">
-			<div class="col-sm-2">result:</div>
-			<div *ngIf="!showFullOutput" class="col-sm-10 cursor-pointer" (click)="toggleFullOutput()">{{result | Cut:80}}</div>
-			<div *ngIf="showFullOutput" class="col-sm-12 cursor-pointer" (click)="toggleFullOutput()"><prettyjson [obj]="niceResult"></prettyjson></div>
-		</div>
-		<div *ngIf="!error && result && !validationError" class="row">
-			<div class="col-10">&nbsp;</div>
-			<div class="col-2 badge-success">VALID</div>
-		</div>
-		<div *ngIf="!error && result && validationError">
+		</li>
+		<li *ngIf="showResult" class="list-group-item">
 			<div class="row">
-				<div class="col-4 badge-danger">INVALID</div>
-				<div class="col-8">{{validationError?.status}}</div>
+				<div class="col-sm-2 col-form-label">Status:</div>
+				<div class="col-sm-10">{{status}}</div>
 			</div>
-			<div *ngFor="let er of validationError?.errors" class="row">
-				<div class="col-sm-6 col-md-5 col-lg-4">{{er.model}}</div>
-				<div class="col-sm-6 col-md-7 col-lg-8">{{er.error}}</div>
+			<div *ngIf="error" class="row">
+				<div *ngIf="errorArray?.length" class="col-12 col-lg-5">
+					<div class="row">
+						<div class="col-sm-2 col-form-label">Errors:</div>
+						<div class="col-sm-10 text-danger">
+							<div *ngFor="let error of errorArray">{{error}}</div>
+						</div>
+					</div>
+				</div>
+				<div *ngIf="errorArray?.length" class="col-12 col-lg-7">
+					<div class="row">
+						<div class="col-sm-2 col-form-label">Response:</div>
+						<div *ngIf="!showFullOutput" class="col-sm-10 cursor-pointer" (click)="toggleFullOutput()">{{error | Cut:80}}</div>
+						<div *ngIf="showFullOutput" class="col-12 col-md-10 cursor-pointer" (click)="toggleFullOutput()"><prettyjson [obj]="niceError"></prettyjson></div>
+					</div>
+				</div>
 			</div>
-		</div>
-	</div>
+			<div *ngIf="result" class="row">
+				<div class="col-sm-2">result:</div>
+				<div *ngIf="!showFullOutput" class="col-sm-10 cursor-pointer" (click)="toggleFullOutput()">{{result | Cut:80}}</div>
+				<div *ngIf="showFullOutput" class="col-sm-12 cursor-pointer" (click)="toggleFullOutput()"><prettyjson [obj]="niceResult"></prettyjson></div>
+			</div>
+			<div *ngIf="!error && result && !validationError" class="row">
+				<div class="col-10">&nbsp;</div>
+				<div class="col-2 badge-success">VALID</div>
+			</div>
+			<div *ngIf="!error && result && validationError">
+				<div class="row">
+					<div class="col-4 badge-danger">INVALID</div>
+					<div class="col-8">{{validationError?.status}}</div>
+				</div>
+				<div *ngFor="let er of validationError?.errors" class="row">
+					<div class="col-sm-6 col-md-5 col-lg-4">{{er.model}}</div>
+					<div class="col-sm-6 col-md-7 col-lg-8">{{er.error}}</div>
+				</div>
+			</div>
+		</li>
+	</ul>
 </div>

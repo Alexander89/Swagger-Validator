@@ -7,6 +7,7 @@ import { Swagger, extractType, SwaggerValidator, ValidationError } from '@servic
 import { ɵa as PrettyJsonComponent } from 'angular2-prettyjson';
 import { ExampleComponent } from '@comp/example/example.component';
 import { SwaggerModeler } from '@services/swagger/swagger-modeler.service';
+import * as S from '@swagger/swagger';
 
 
 @Component({
@@ -50,12 +51,11 @@ export class CallComponent {
 			} else {
 				this.result = v;
 				this.validationError = this.validator.validateReply(this.call, v);
-				console.log(JSON.stringify(this.validationError));
 			}
 		}, e => {
 			this.showResult = true;
-			this.status = 'receive Error';
-			this.error = e;
+			this.status = `receive Error ${e.status}: ${this.call.responses[e.status].description}`;
+			this.error = e.error;
 		});
 	}
 
@@ -76,11 +76,9 @@ export class CallComponent {
 		this.showResult = false;
 	}
 
-	get returnValue(): string | undefined {
-		return Swagger.extractReturnType(this.call);
-	}
 
 	public extractType(param: Parameter): string { return extractType(param); }
+	public getParamSchem(param: Parameter): S.Schema { return this.swagger.def.definitions[extractType(param)]; }
 	public toggleFullOutput() { this.showFullOutput = !this.showFullOutput; }
 
 	public useExampleOnBody() {
@@ -88,6 +86,9 @@ export class CallComponent {
 		this.call.values['body'] = this.modeler.createExample(Swagger.extractType(bodyParam));
 	}
 
+	public trackResponse(index: number, response: S.Response) { return response.description; }
+
+	get returnValue(): string | undefined { return Swagger.extractReturnType(this.call); }
 	get niceResult() { return JSON.stringify(JSON.parse(this.result), null, 4); }
 	get niceError() { return JSON.stringify(JSON.parse(this.error), null, 4); }
 	get errorArray(): Array<string> {
@@ -100,4 +101,5 @@ export class CallComponent {
 		}
 		return errorList.error;
 	}
+	get responses(): Array<string> { return Object.getOwnPropertyNames(this.call.responses); }
 }

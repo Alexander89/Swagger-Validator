@@ -1,12 +1,12 @@
 <div class="row">
 	<div class="col-12">
-		<span class="h6">Response as:</span>
-		<span class="btn-link" (click)="showInfo()">Model</span>
-		<span class="btn-link" (click)="showExample()">Example</span>
+		<span class="h6">{{title}}</span>
+		<span class="btn-link" (click)="mode='model'">Model </span>
+		<span class="btn-link" (click)="mode='example'">Example</span>
 	</div>
 </div>
 <div class="row border border-info rounded py-2">
-	<div  *ngIf="exampleVisible" class="col-12">
+	<div *ngIf="exampleVisible" class="col-12">
 		<prettyjson [obj]="example"></prettyjson>
 	</div>
 	<div *ngIf="infoVisible" class="col-12">
@@ -30,7 +30,7 @@
 				<div class="col-lg-7 col-xl-8">{{text}} </div>
 			</div>
 		</span>
-		<span *ngIf="!collapsed[entry.name]">
+		<ng-container *ngIf="!collapsed[entry.name]">
 			<div *ngIf="entry.type=='object'" class="col-12 pl-3" >
 				<div class="d-block border-left border-top border-gray pl-3">
 					<ng-container *ngTemplateOutlet="modelTemplate;context:{$implicit: entry.subModelData, name: entry.name}"></ng-container>
@@ -39,6 +39,6 @@
 			<div *ngIf="entry.type=='array'" class="col-12">
 				<ng-container *ngTemplateOutlet="modelTemplate;context:{$implicit: entry.subModelData, name: entry.name}"></ng-container>
 			</div>
-		</span>
+		</ng-container>
 	</div>
 </ng-template>

@@ -10,10 +10,9 @@ import { Swagger } from '@app/services/swagger';
   styleUrls: ['./example.component.css']
 })
 export class ExampleComponent implements OnInit, OnChanges {
-	@Input() call: S.Call;
-	@Input() type: string;
-	infoVisible = true;
-	exampleVisible = false;
+	@Input() schema: S.Schema;
+	@Input() title: string;
+	@Input() mode: string;
 	example = '{}';
 	modelData: Array<ModelInfo>;
 	rootName: string;
@@ -28,24 +27,15 @@ export class ExampleComponent implements OnInit, OnChanges {
 	}
 
 	ngOnChanges() {
-		if (this.call) {
-			this.rootName = Swagger.extractReturnType(this.call);
-		} else if (this.type) {
-			this.rootName = this.type;
-		}
-		this.example = this.modeler.createExample(this.rootName);
-		this.modelData = [this.modeler.createInfo(this.rootName)];
+
+		this.collapsed[this.schema.name] = true;
+
+		this.example = this.modeler.createExampleBySchema(this.schema);
+		this.modelData = [this.modeler.createInfoBySchema(this.schema)];
 	}
 
-	showInfo() {
-		this.infoVisible = true;
-		this.exampleVisible = false;
-	}
-	showExample() {
-		this.exampleVisible = true;
-		this.infoVisible = false;
-	}
-
+	get infoVisible(): boolean { return !this.exampleVisible; }// extend with other modes to use this as default
+	get exampleVisible(): boolean { return this.mode === 'example'; }
 	toggle(modelName: string) {
 		this.collapsed[modelName] = !this.collapsed[modelName];
 	}

@@ -34,4 +34,6 @@ export interface Parameter {
 export interface Response {
 	description: string;
 	schema: Schema;
+
+	refName?: string;
 }

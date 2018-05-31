@@ -3,6 +3,8 @@ export interface SwaggerModels {
 }
 
 export interface Schema {
+	name?: string;
+
 	$ref?: string;
 
 	type?: 'object' | 'array' | 'integer' | 'number' | 'string' | 'boolean' | 'float';
