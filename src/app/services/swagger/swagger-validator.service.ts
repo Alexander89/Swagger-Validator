@@ -148,7 +148,7 @@ export class SwaggerValidator {
 	private validateObject(schema: S.Schema, obj: any): ValidationError {
 		let error: ValidationError;
 		const existingProperties = Object.getOwnPropertyNames(obj);
-		error = this.combineErrors(error, this.checkRequiredProperties(existingProperties, schema));
+		error = this.combineErrors(error, this.checkProperties(existingProperties, schema));
 		existingProperties.forEach((prop) => {
 			const tempName = this.actualSchema;
 			this.actualSchema = `${this.actualSchema}::${prop}`;
@@ -221,24 +221,35 @@ export class SwaggerValidator {
 		return tsType === typeof obj;
 	}
 
-	private checkRequiredProperties(propNames: Array<string>, schema: S.Schema): ValidationError | undefined {
+	private checkProperties(propNames: Array<string>, schema: S.Schema): ValidationError | undefined {
 		// array to store not found properties
 		const missingProps = [] as Array<string>;
+		const addedProps = [] as Array<string>;
 
-		// nothing required, then return undefined
-		if (!schema.required) {
-			return undefined;
+		// check if there is something required
+		if (schema.required) {
+			// check if all required properties are in the propName array
+			schema.required.forEach(reqP => {
+				if (propNames.indexOf(reqP) === -1) {
+					missingProps.push(reqP);
+				}
+			});
 		}
-		// check if all required properties are in the propName array
-		schema.required.forEach(reqP => {
-			if (propNames.indexOf(reqP) === -1) {
-				missingProps.push(reqP);
-			}
-		});
+		// check if additional properties are added
+		if (!schema.additionalProperties) {
+			const allowedProperties = Object.getOwnPropertyNames(schema.properties);
+			propNames.forEach(prop => {
+				if (allowedProperties.indexOf(prop) === -1) {
+					addedProps.push(prop);
+				}
+			});
+		}
+
+		let error: ValidationError;
 		// if some Properties are missing
 		if (missingProps.length) {
 			// return error data as ValidationError
-			return {
+			error = this.combineErrors(error, {
 				status: 'missing required fields',
 				errors: missingProps.map(p => {
 					return {
@@ -246,10 +257,20 @@ export class SwaggerValidator {
 						model: this.actualSchema,
 					};
 				})
-			};
+			});
+		}
+		// if some Properties are too much
+		if (addedProps.length) {
+			// return error data as ValidationError
+			error = this.combineErrors(error, {
+				status: 'additional Property found',
+				errors: addedProps.map(p => {
+					return { error: p, model: this.actualSchema };
+				})
+			});
 		}
 		// undefined means no error
-		return undefined;
+		return error;
 	}
 }
 

@@ -29,6 +29,7 @@ export interface Schema {
 	properties?: SwaggerModels;
 	example?: string;
 	default?: string;
+	additionalProperties?: boolean;
 
 	// array
 	minItems?: number;
