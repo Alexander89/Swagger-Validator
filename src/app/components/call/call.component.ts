@@ -37,7 +37,7 @@ export class CallComponent {
 	constructor(private validator: SwaggerValidator, private modeler: SwaggerModeler, protected swagger: Swagger, protected httpClient: HttpClient, private zone: NgZone) {
 	}
 
-	protected toggleCollapse() { this.collapsed = ! this.collapsed; }
+	public toggleCollapse() { this.collapsed = ! this.collapsed; }
 
 	protected request() {
 		this.error = undefined;

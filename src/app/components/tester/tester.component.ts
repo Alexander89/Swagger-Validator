@@ -14,14 +14,13 @@ export class TesterComponent implements OnInit, OnChanges {
 
 	@Input() source: string;
 	private loadSource: string;
-	protected status: string;
+	public status: string;
 
 	protected info: S.Info;
-	protected def: S.Root;
 
 	private openSubscription: Subscription;
 
-	constructor(private cd: ChangeDetectorRef, protected swagger: Swagger, protected httpClient: HttpClient) {
+	constructor(private cd: ChangeDetectorRef, public swagger: Swagger, protected httpClient: HttpClient) {
 		this.openSubscription = undefined;
 		this.status = 'ready';
 	}

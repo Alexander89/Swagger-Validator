@@ -7,7 +7,7 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
 	public readonly title = 'Swagger-Validator';
-	public _source: string;
+	private _source: string;
 
 	constructor() {
 		const hostname = localStorage.getItem('hostName');
