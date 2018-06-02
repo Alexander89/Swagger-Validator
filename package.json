@@ -1,7 +1,12 @@
 {
-  "name": "api-test",
+  "name": "Swagger-Validator",
   "version": "0.0.0",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alexanderhalemba/swagger-validator"
+  },
+  "author": "Alexander Halemba",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
