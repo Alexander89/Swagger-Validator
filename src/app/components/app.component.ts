@@ -9,11 +9,17 @@ export class AppComponent {
 	/** title for the Application */
 	public readonly title = 'Swagger-Validator';
 	private _source: string;
+	private _testServer: string;
+	public showServer: boolean;
 
 	constructor() {
 		const hostname = localStorage.getItem('hostName');
 		if (hostname) {
 			this._source = hostname;
+		}
+		const server = localStorage.getItem('testServer');
+		if (server) {
+			this._testServer = server;
 		}
 	}
 
@@ -24,4 +30,13 @@ export class AppComponent {
 	}
 	/** set the JSON source */
 	get source(): string { return this._source; }
+
+
+	/** set the testServer to the template and update the localStore */
+	set testServer(src: string) {
+		localStorage.setItem('testServer', src);
+		this._testServer = src;
+	}
+	/** set the JSON source */
+	get testServer(): string { return this._testServer; }
 }

@@ -5,13 +5,39 @@
 			<h2>{{title}}</h2>
 		</div>
 
-		<div class="col-12 ">
-			<label for="source" class="form-label">Source: </label>
+		<div class="col-md-6">
+			<div class="row">
+				<div class="col-md-12">
+					<label for="source" class="form-label">Source</label>
+				</div>
+				<div class="col-12">
+					<input type="text" name="source" id="source" class="form-control" [(ngModel)]="source">
+				</div>
+			</div>
 		</div>
-		<div class="col-12">
-			<input type="text" name="source" id="source" class="form-control" [(ngModel)]="source">
+		<div class="col-md-6">
+			<div class="row">
+				<div class="col-md-4">
+					<label for="source" class="form-label">Test Server</label>
+				</div>
+				<div class="col-12">
+					<input type="text" name="source" id="source" class="form-control" [(ngModel)]="testServer">
+				</div>
+				<div class="col-12">
+					<div class="btn btn-primary" (click)="showServer = !showServer">
+						Connect
+					</div>
+				</div>
+			</div>
 		</div>
+	</div>
 </div>
+<div class="row">
+	<div class="col-12" [class.col-lg-8]="showServer">
+		<app-tester [source]="source"></app-tester>
+	</div>
+	<div *ngIf="!showServerrr" class="col-lg-4">
+		<app-test-server [path]="source" [source]="testServer" [connect]="showServer"></app-test-server>
+	</div>
 </div>
-<app-tester [source]="source"></app-tester>
 

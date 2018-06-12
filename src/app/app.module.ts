@@ -16,6 +16,8 @@ import { JsonPipe } from '@angular/common';
 import { ɵa as PrettyJsonComponent } from 'angular2-prettyjson';
 
 import { CutPipe } from '@pipes/cut.pipe';
+import { TestServerComponent } from './components/test-server/test-server.component';
+import { TestServer } from '@services/test-server/test-server.service';
 
 @NgModule({
 	imports: [
@@ -30,12 +32,14 @@ import { CutPipe } from '@pipes/cut.pipe';
 		TesterComponent,
 		CallComponent,
 		CutPipe,
-		ExampleComponent
+		ExampleComponent,
+		TestServerComponent
 	],
 	providers: [
 		Swagger,
 		SwaggerValidator,
 		SwaggerModeler,
+		TestServer,
 		{ provide: JsonPipe, useClass: SafeJsonPipe }
 	],
 	bootstrap: [AppComponent]

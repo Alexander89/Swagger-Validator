@@ -15,6 +15,8 @@ export interface Schema {
 
 	/** reference to an other model */
 	$ref?: string;
+	value?: any;
+	present?: boolean;
 
 	/** data type */
 	type?: 'object' | 'array' | 'integer' | 'number' | 'string' | 'boolean' | 'float';

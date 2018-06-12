@@ -29,6 +29,8 @@ export interface Call {
 		[code: string]: Response;
 	};
 
+	/** id for the test server to reference the call */
+	id?: number;
 	/** generated name for this call (path) */
 	callName?: string;
 	/** generated method name for this call (method) */
@@ -61,6 +63,9 @@ export interface Parameter {
  * Response structure for the calls
  */
 export interface Response {
+	/** name of the response */
+	name?: string;
+
 	/** description when the response will be received */
 	description: string;
 	/** content schema of the response */

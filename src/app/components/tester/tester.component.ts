@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { HttpClient, HttpHandler, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -10,9 +10,9 @@ import * as S from '@swagger/swagger';
   templateUrl: './tester.component.html',
   styleUrls: ['./tester.component.css']
 })
-export class TesterComponent implements OnChanges {
+export class TesterComponent  {
 	/** url to load the swagger definition from */
-	@Input() source: string;
+	private _source: string;
 	/** resource who is loaded actually */
 	private loadSource: string;
 	/** http status for get call */
@@ -29,33 +29,6 @@ export class TesterComponent implements OnChanges {
 		this.status = 'ready';
 	}
 
-	/**
-	 * handler when Input is changed or other fields ar changed
-	 */
-	public ngOnChanges() {
-		// on every change check if the source is changed
-		if (this.loadSource !== this.source) {
-			// hand over source to avoid recheck
-			this.loadSource = this.source;
-			// unsubscribe open subscription
-			if (this.openSubscription && !this.openSubscription.closed) {
-				this.openSubscription.unsubscribe();
-			}
-			// load JSON fro source
-			this.openSubscription = this.loadJson(this.source).subscribe(body => {
-				try {
-					this.swagger.def = body;
-					this.info = body.info;
-					this.status = 'JSON loaded';
-					this.selectedScheme = body.schemes[0];
-				} catch (e) {
-					this.status = `invalid JSON ${e}`;
-				}
-			}, e => {
-				this.status = `invalid URL ${e}`;
-			});
-		}
-	}
 
 	/**
 	 * Load the Json and return an observable to get the Swagger definition
@@ -74,14 +47,12 @@ export class TesterComponent implements OnChanges {
 		);
 	}
 
-	/** getter for the swagger path array */
-	get pathArray() { return this.swagger.pathArray; }
-
 	/**
 	 * Tag tracker for the ngFor loop
 	 * @param index index of the item
 	 * @param tag tag to be tracked
 	 */
+
 	public trackTag(index, tag: S.Tag) { return tag.name; }
 	/**
 	 * Call tracker for the ngFor loop
@@ -96,9 +67,36 @@ export class TesterComponent implements OnChanges {
 	 */
 	public trackMeth(index, method) { return method.name; }
 
+	/** getter for the source */
+	get source(): string { return this._source; }
+
+	/** set the new source and do the network request to get the definition */
+	@Input('source') set source(value: string) {
+		this._source = value;
+		// hand over source to avoid recheck
+		this.loadSource = this.source;
+		// unsubscribe open subscription
+		if (this.openSubscription && !this.openSubscription.closed) {
+			this.openSubscription.unsubscribe();
+		}
+		// load JSON fro source
+		this.openSubscription = this.loadJson(this.source).subscribe(body => {
+			try {
+				this.swagger.def = body;
+				this.info = body.info;
+				this.status = 'JSON loaded';
+				this.selectedScheme = body.schemes[0];
+			} catch (e) {
+				this.status = `invalid JSON ${e}`;
+			}
+		}, e => {
+			this.status = `invalid URL ${e}`;
+		});
+	}
+	/** getter for the swagger path array */
+	get pathArray() { return this.swagger.pathArray; }
 	/** getter for the selected scheme */
 	get selectedScheme(): string {return this.swagger.selectedRequestScheme; }
-	/** setter for the selecte scheme */
+	/** setter for the selected scheme */
 	set selectedScheme(value: string) { this.swagger.selectedRequestScheme = value; }
-
 }
