@@ -55,22 +55,6 @@
 		</li>
 		<li class="list-group-item px-0 px-md-3">
 			<div class="card mb-2">
-				<div class="card-header cursor-pointer" (click)="toggleDetails()">
-					Reply details
-					<ng-container *ngIf="details"> (Close)</ng-container>
-				</div>
-				<div *ngIf="details"  class="card-body">
-					<app-example *ngIf="call.responses[200]" [schema]="call.responses[200].schema" title="200: {{call.responses[200].description}}" class="mb-3"></app-example>
-					<div *ngFor="let response of responses; trackBy: trackResponse" class="row mb-3">
-						<ng-container *ngIf="response !== '200'">
-							<strong class="col-sm-2 col-lg-1">{{response}}:</strong>
-							<div *ngIf="!call.responses[response].schema" class="col-sm-10 col-lg-11">{{call.responses[response].description}}</div>
-							<app-example *ngIf="call.responses[response].schema" mode="example" title="{{call.responses[response].description}}" [schema]="call.responses[response].schema" class="col-sm-10 col-lg-11"></app-example>
-						</ng-container>
-					</div>
-				</div>
-			</div>
-			<div class="card">
 				<div class="card-header cursor-pointer" (click)="toggleShowCall()">
 					Parameter / Try-it
 					<ng-container *ngIf="tryItOut"> (Close)</ng-container>
@@ -125,6 +109,22 @@
 					</div>
 				</div>
 			</div>
+			<div class="card">
+				<div class="card-header cursor-pointer" (click)="toggleDetails()">
+					Reply details
+					<ng-container *ngIf="details"> (Close)</ng-container>
+				</div>
+				<div *ngIf="details"  class="card-body">
+					<app-example *ngIf="call.responses[200]" [schema]="call.responses[200].schema" title="200: {{call.responses[200].description}}" class="mb-3"></app-example>
+					<div *ngFor="let response of responses; trackBy: trackResponse" class="row mb-3">
+						<ng-container *ngIf="response !== '200'">
+							<strong class="col-sm-2 col-lg-1">{{response}}:</strong>
+							<div *ngIf="!call.responses[response].schema" class="col-sm-10 col-lg-11">{{call.responses[response].description}}</div>
+							<app-example *ngIf="call.responses[response].schema" mode="example" title="{{call.responses[response].description}}" [schema]="call.responses[response].schema" class="col-sm-10 col-lg-11"></app-example>
+						</ng-container>
+					</div>
+				</div>
+			</div>
 		</li>
 		<li *ngIf="showResult" class="list-group-item px-0 px-md-3">
 			<div class="row">
@@ -144,14 +144,20 @@
 					<div class="row">
 						<div class="col-sm-2 col-form-label">Response:</div>
 						<div *ngIf="!showFullOutput" class="col-sm-10 cursor-pointer" (click)="toggleFullOutput()">{{error | Cut:80}}</div>
-						<div *ngIf="showFullOutput" class="col-12 col-md-10 cursor-pointer" (click)="toggleFullOutput()"><prettyjson [obj]="niceError"></prettyjson></div>
+						<div *ngIf="showFullOutput" class="col-sm-10">
+							<div class="btn btn-secondary" (click)="toggleFullOutput()">Close output</div>
+						</div>
+						<div *ngIf="showFullOutput" class="col-12 col-md-10"><prettyjson [obj]="niceError"></prettyjson></div>
 					</div>
 				</div>
 			</div>
 			<div *ngIf="result" class="row">
 				<div class="col-sm-2">result:</div>
 				<div *ngIf="!showFullOutput" class="col-sm-10 cursor-pointer" (click)="toggleFullOutput()">{{result | Cut:80}}</div>
-				<div *ngIf="showFullOutput" class="col-sm-12 cursor-pointer" (click)="toggleFullOutput()"><prettyjson [obj]="niceResult"></prettyjson></div>
+				<div *ngIf="showFullOutput" class="col-sm-10">
+					<div class="btn btn-secondary" (click)="toggleFullOutput()">Close output</div>
+				</div>
+				<div *ngIf="showFullOutput" class="col-sm-12"><prettyjson [obj]="niceResult"></prettyjson></div>
 			</div>
 			<div *ngIf="!error && result && !validationError" class="row">
 				<div class="col-10">&nbsp;</div>

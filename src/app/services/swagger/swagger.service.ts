@@ -91,7 +91,7 @@ export class Swagger {
 		if (!call.responses || !call.responses[200] || !call.responses[200].schema) {
 			return undefined;
 		}
-		return splitRef(call.responses[200].refName);
+		return this.splitRef(call.responses[200].refName);
 	}
 
 	get def() { return this._def; }

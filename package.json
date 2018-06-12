@@ -13,8 +13,8 @@
     "build": "ng build --prod",
     "test": "ng test",
     "lint": "ng lint",
-	"e2e": "ng e2e",
-	"dockerBuild": "ng build && docker build -t alexanderhalemba/swagger-validator -f docker/Dockerfile ."
+    "e2e": "ng e2e",
+    "dockerBuild": "ng build && docker build -t alexanderhalemba/swagger-validator -f docker/Dockerfile ."
   },
   "private": true,
   "dependencies": {

@@ -6,6 +6,7 @@ import { Component } from '@angular/core';
 	styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+	/** title for the Application */
 	public readonly title = 'Swagger-Validator';
 	private _source: string;
 
