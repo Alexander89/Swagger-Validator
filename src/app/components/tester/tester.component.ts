@@ -72,7 +72,7 @@ export class TesterComponent implements OnInit, OnChanges {
 	public trackCall(index, call) { return call.callName; }
 	public trackMeth(index, method) { return method.name; }
 
-	get selectedScheme(): string {return this.swagger.selectedRequestSchema; }
-	set selectedScheme(value: string) { this.swagger.selectedRequestSchema = value; }
+	get selectedScheme(): string {return this.swagger.selectedRequestScheme; }
+	set selectedScheme(value: string) { this.swagger.selectedRequestScheme = value; }
 
 }
