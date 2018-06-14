@@ -203,7 +203,6 @@ export class Swagger {
 	 */
 	protected sendRequest(call: S.Call, req: any): Observable<any> {
 		let headers = req.header;
-		headers = headers.append('access-control-allow-origin', '*');
 		headers = headers.append('content-type', 'application/json');
 		headers = headers.append('accept', 'application/json');
 
