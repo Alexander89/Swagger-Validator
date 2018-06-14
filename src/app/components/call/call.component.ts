@@ -64,11 +64,11 @@ export class CallComponent {
 
 		this.swagger.procRequest(this.call).subscribe(v => {
 			this.showResult = true;
-			if (v.length < 100) {
+			if (v.length < 100 && v !== 'null') {
 				this.status = v;
 			} else {
-				this.result = v;
-				this.validationError = this.validator.validateReply(this.call, v);
+				this.result = v !== 'null' ? v : 'Successful Operation';
+				this.validationError = v !== 'null' ? this.validator.validateReply(this.call, v) : {status: '200'};
 			}
 		}, e => {
 			this.showResult = true;

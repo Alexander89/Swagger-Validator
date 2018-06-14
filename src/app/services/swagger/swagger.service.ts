@@ -202,10 +202,9 @@ export class Swagger {
 	 * @param req pre designed request to send
 	 */
 	protected sendRequest(call: S.Call, req: any): Observable<any> {
-		const headers = req.header;
-		headers.append('access-control-allow-origin', '*');
-		headers.append('content-type', 'application/json');
-		headers.append('accept', 'application/json');
+		let headers = req.header;
+		headers = headers.append('content-type', 'application/json');
+		headers = headers.append('accept', 'application/json');
 
 		const options = {
 			headers,
