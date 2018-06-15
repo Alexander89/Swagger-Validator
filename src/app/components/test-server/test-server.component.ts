@@ -15,7 +15,7 @@ export class TestServerComponent implements OnInit {
 	public _connected: boolean;
 
 	public _selectedCall: number;
-	public currentCall: Call;
+	public currentCall: CallData;
 	private _availableCalls = [] as Array<CallData>;
 
 	constructor(private readonly server: TestServer) {}
@@ -52,7 +52,7 @@ export class TestServerComponent implements OnInit {
 		const data = this.availableCalls.find(c => c.id === this._selectedCall);
 		if (data) {
 			try {
-				this.currentCall = data.call;
+				this.currentCall = data;
 			} catch (e) {
 				console.error('can not parse JSON ' + e);
 			}
@@ -60,9 +60,12 @@ export class TestServerComponent implements OnInit {
 	}
 
 	get responses(): Array<Response> {
-		const names = Object.getOwnPropertyNames(this.currentCall.responses);
-		return names.map(name => this.currentCall.responses[name]);
+		const names = Object.getOwnPropertyNames(this.currentCall.call.responses);
+		return names.map(name => this.currentCall.call.responses[name]);
 	}
 	public trackAvCalls(index, call: Call) { return call.id; }
 	public trackResponses(index, resp: Response) { return resp.name; }
+
+	get selectedResult(): string { return this._availableCalls[this.selectedCall].jsonData.selectedResponse; }
+	set selectedResult(call: string) { this._availableCalls[this.selectedCall].jsonData.selectedResponse = call; }
 }

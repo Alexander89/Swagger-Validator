@@ -1,7 +1,7 @@
 import * as S from '@swagger/swagger';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
 @Injectable()
 export class Swagger {
@@ -182,14 +182,14 @@ export class Swagger {
 	 * do the call with the definition and the set values
 	 * @param call call to send the process Request
 	 */
-	public procRequest(call: S.Call): Observable<string> {
-		return new Observable<string>(ob => {
+	public procRequest(call: S.Call): Observable<HttpResponse<string> | string> {
+		return new Observable<HttpResponse<string> | string>(ob => {
 			ob.next('build Request');
 			const req = this.makeRequest(call);
 			ob.next('send Request');
 			this.sendRequest(call, req).subscribe(res => {
 				ob.next('received success');
-				ob.next(JSON.stringify(res));
+				ob.next(res);
 				ob.complete();
 			}, e => {
 				ob.error({error: JSON.stringify(e), status: e.status});
@@ -201,14 +201,14 @@ export class Swagger {
 	 * @param call swagger call to be send
 	 * @param req pre designed request to send
 	 */
-	protected sendRequest(call: S.Call, req: any): Observable<any> {
+	protected sendRequest(call: S.Call, req: any): Observable<HttpResponse<string>> {
 		let headers = req.header;
 		headers = headers.append('content-type', 'application/json');
 		headers = headers.append('accept', 'application/json');
 
 		const options = {
 			headers,
-			observe: 'body' as 'body',
+			observe: 'response' as 'response',
 			reportProgress: false
 		};
 

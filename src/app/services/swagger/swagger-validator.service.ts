@@ -19,13 +19,13 @@ export class SwaggerValidator {
 	constructor(private swagger: Swagger) {}
 
 	public validateReply(call: S.Call, reply: string | any): ValidationError | undefined {
-		if (reply.indexOf('{') === -1) {
-			return { status: 'invalid reply', errors: [{model: this.actualSchema, error: 'reply is not a JSON'}] };
-		}
-		reply = JSON.parse(reply);
-		if (!reply) {
-			return { status: 'invalid reply', errors: [{model: this.actualSchema, error: 'reply is an invalid JSON'}] };
-		}
+		// if (reply.indexOf('{') === -1) {
+		// 	return { status: 'invalid reply', errors: [{model: this.actualSchema, error: 'reply is not a JSON'}] };
+		// }
+		// reply = JSON.parse(reply);
+		// if (!reply) {
+		// 	return { status: 'invalid reply', errors: [{model: this.actualSchema, error: 'reply is an invalid JSON'}] };
+		// }
 		this.actualSchema = 'mainModel';
 		const returnType = Swagger.extractReturnType(call);
 		if (!returnType) {

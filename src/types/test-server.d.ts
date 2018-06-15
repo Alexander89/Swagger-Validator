@@ -23,13 +23,6 @@ declare namespace TestServerApi {
 	interface CommandUpdatePath {
 		path: string;
 	}
-	interface CallData {
-		id?: number;
-		callName: string;
-		method: string;
-		call: Call;
-		jsonData?: string;
-	}
 	interface CommandUpdateCallData {
 		call: string;
 		jsonData: CallData;
@@ -38,6 +31,28 @@ declare namespace TestServerApi {
 		timestamp: number;
 		lvl: MessageLvl;
 		message: string;
+	}
+
+	interface ReturnSchema {
+		name: string;
+		type: 'object' | 'array' | 'integer' | 'number' | 'string' | 'boolean' | 'float';
+		example: any;
+		required: boolean;
+		present: boolean;
+		objectSchema?: Array<ReturnSchema>;
+		arraySchema?: Array<ReturnSchema>;
+	}
+	interface CallConfigStructure {
+		availableResponses: Array<string>;
+		selectedResponse: string;
+		returnStructures: {[returnState: string]: ReturnSchema};
+	}
+	interface CallData {
+		id?: number;
+		callName: string;
+		method: string;
+		call: Call;
+		jsonData?: CallConfigStructure;
 	}
 }
 export = TestServerApi;
