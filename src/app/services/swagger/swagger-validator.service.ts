@@ -208,6 +208,7 @@ export class SwaggerValidator {
 			// types to translate
 			case 'array':
 				return isArray(obj);
+			case 'number':
 			case 'integer':
 			case 'float':
 				tsType = 'number';

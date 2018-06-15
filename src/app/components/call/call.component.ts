@@ -72,7 +72,7 @@ export class CallComponent {
 			}
 		}, e => {
 			this.showResult = true;
-			this.status = `receive Error ${e.status}: ${this.call.responses[e.status].description}`;
+			this.status = e.status === 0 ? 'Network error' : `receive Error ${e.status}: ${this.call.responses[e.status].description}`;
 			this.error = e.error;
 		});
 	}

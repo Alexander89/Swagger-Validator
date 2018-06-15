@@ -54,7 +54,7 @@
 	</div>
 	<div *ngFor="let row of log" class="row">
 		<div class="col-3">
-			{{row.timestamp}}
+			{{row.timestamp | date:'HH:mm:ss,S'}}
 		</div>
 		<div class="col-7">
 			{{row.message}}

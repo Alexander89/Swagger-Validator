@@ -32,8 +32,7 @@ export class TestServerComponent implements OnInit {
 				this.server.getAvailableCalls().then(calls => {
 					this._availableCalls = calls;
 					this._availableCalls.forEach(call => {
-						call.data = JSON.parse(call.jsonData) as Call;
-						Object.getOwnPropertyNames(call.data.responses).forEach(res => call.data.responses[res].name = res);
+						Object.getOwnPropertyNames(call.call.responses).forEach(res => call.call.responses[res].name = res);
 					});
 				});
 			});
@@ -53,7 +52,7 @@ export class TestServerComponent implements OnInit {
 		const data = this.availableCalls.find(c => c.id === this._selectedCall);
 		if (data) {
 			try {
-				this.currentCall = data.data as Call;
+				this.currentCall = data.call;
 			} catch (e) {
 				console.error('can not parse JSON ' + e);
 			}

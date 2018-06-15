@@ -1,3 +1,5 @@
+import { Call } from '../app/models/swagger/swagger';
+
 declare namespace TestServerApi {
 	type AvailableCommands =  'open' | 'close' | 'getCalls' | 'getCallData' | 'updatePath' | 'updateCallData' | 'event' ;
 	type AvailableDataTypes = CommandOpen | ReplyOpen | CommandUpdatePath | CallData | CallData[] | CommandUpdateCallData | EventMessage | undefined;
@@ -25,8 +27,8 @@ declare namespace TestServerApi {
 		id?: number;
 		callName: string;
 		method: string;
+		call: Call;
 		jsonData?: string;
-		data?: any;
 	}
 	interface CommandUpdateCallData {
 		call: string;

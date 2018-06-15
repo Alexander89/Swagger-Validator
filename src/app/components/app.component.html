@@ -36,7 +36,7 @@
 	<div class="col-12" [class.col-lg-8]="showServer">
 		<app-tester [source]="source"></app-tester>
 	</div>
-	<div *ngIf="!showServerrr" class="col-lg-4">
+	<div *ngIf="showServer" class="col-lg-4">
 		<app-test-server [path]="source" [source]="testServer" [connect]="showServer"></app-test-server>
 	</div>
 </div>
