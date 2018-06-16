@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, DoCheck, Input } from '@angular/core';
 import { TestServer } from '@services/test-server/test-server.service';
 import { EventMessage, CallData, ReturnSchema } from 'types/test-server';
 import { Call, Response } from '@app/models/swagger/calls';
@@ -9,7 +9,7 @@ import { isArray } from 'util';
   templateUrl: './test-server.component.html',
   styleUrls: ['./test-server.component.css']
 })
-export class TestServerComponent implements OnInit {
+export class TestServerComponent implements DoCheck {
 	@Input() source: string;
 	@Input() path: string;
 	public sessionId: number;
@@ -19,9 +19,22 @@ export class TestServerComponent implements OnInit {
 	private _availableCalls = [] as Array<CallData>;
 	public currentCall: CallData;
 
+	private lastUpdate: string;
+	private autoSaveTimer: number;
+
 	constructor(private readonly server: TestServer) {}
 
-	ngOnInit() {
+	ngDoCheck() {
+		if (this.currentCall) {
+			const checksum = JSON.stringify(this.currentCall.jsonData);
+			if (this.lastUpdate !== checksum) {
+				this.lastUpdate = checksum;
+				window.clearTimeout(this.autoSaveTimer);
+				this.autoSaveTimer = window.setTimeout(() => {
+					this.applyCall();
+				}, 3000);
+			}
+		}
 	}
 
 	public getCurrentReturnSchema(type: string): ReturnSchema { return this.currentCall.jsonData.returnStructures[type]; }
