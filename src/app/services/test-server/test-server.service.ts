@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import * as TestServerApi from 'types/test-server';
-import * as S from '@swagger/swagger';
 
 interface Calls {
 	command: TestServerApi.Command;
@@ -108,6 +107,20 @@ export class TestServer {
 		return new Promise<Array<TestServerApi.CallData>>((resolve, reject) => {
 			this.call('getCalls').then(
 				call => resolve(call.reply as TestServerApi.CallData[])
+			).catch(
+				r => reject(r)
+			);
+		});
+	}
+
+	/**
+	 * Send the new configured call to the test-Server
+	 * @param data data to set on the server
+	 */
+	public setCallData(call: TestServerApi.CallData) {
+		return new Promise<any>((resolve, reject) => {
+			this.call('updateCallData', {config: call.jsonData, callId: call.id}).then(
+				rep => resolve(rep.reply as TestServerApi.CallData)
 			).catch(
 				r => reject(r)
 			);

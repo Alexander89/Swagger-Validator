@@ -1,20 +1,25 @@
 <div class="container-fluid">
-		<h2>Test-Server</h2>
+	<div class="row">
+		<h2 class="col-12">Test-Server</h2>
+	</div>
 
-		<p *ngIf="connect">
-			Ready: Access link: http://{{source}}/{{sessionId}}/&lt;call&gt;
-		</p>
+	<p class="row">
+		<span class="col-12">Access link: http://{{source}}/{{sessionId}}/&lt;call&gt;</span>
+	</p>
 
-		<div class="row">
-			<div class="col-3">select testing call</div>
-			<div class="col-9">
-				<select name="callSelect" [(ngModel)]="selectedCall">
-					<option *ngFor="let call of availableCalls; trackBy: trackAvCalls" value="{{call.id}}">{{call.id}} {{call.method}} {{call.callName}}</option>
-				</select>
-			</div>
+	<div class="row mb-3">
+		<div class="col-1">
+			<strong>Call:</strong>
 		</div>
+		<div class="col-11">
+			<select name="callSelect" [(ngModel)]="selectedCall" style="max-width: 100%">
+				<option *ngFor="let call of availableCalls; trackBy: trackAvCalls" value="{{call.id}}">{{call.id}} {{call.method}} {{call.callName}}</option>
+			</select>
+		</div>
+	</div>
 
-		<div *ngIf="currentCall" class="card">
+	<div class="row">
+		<div *ngIf="currentCall" class="card" style="width: 100%">
 			<div class="card-header">
 				<div><div class="badge">{{currentCall?.method}}</div> {{currentCall?.callName}}</div>
 			</div>
@@ -28,15 +33,24 @@
 								{{res?.description}}
 							</div>
 						</div>
-						<div *ngIf="res?.name === selectedResult" class="card-body">
-							<div class="col-12">{{currentCall.jsonData.returnStructures[selectedResult].name}}</div>
+						<div *ngIf="res?.name === selectedResult && getCurrentReturnSchema(res.name)" class="card-body">
+							<ng-container *ngTemplateOutlet="dataTemplate;context:{$implicit: getCurrentReturnSchema(res.name)}"></ng-container>
 						</div>
 					</div>
 				</div>
 			</div>
+			<div class="card-footer">
+				<div class="row">
+					<div class="col-7">$nbsp;</div>
+					<div class="col-5 btn btn-success" (click)="applyCall()">apply Data</div>
+				</div>
+			</div>
 		</div>
+	</div>
 
-		<div class="card">
+	<div class="row">
+		<div class="col-12">
+			<div class="card">
 				<div class="card-header">
 				<div class="row">
 					<div class="col-10 h4">
@@ -73,3 +87,67 @@
 			</div>
 		</div>
 	</div>
+</div>
+
+
+<ng-template #entryTemplate let-schema>
+	<div class="row">
+		<div class="col-1 px-0">
+			<input type="checkbox" [(ngModel)]="schema.present"/>
+			<span *ngIf="schema.required" class="mr-1" class="required">*</span>
+		</div>
+		<div class="col-11">
+			<ng-container *ngTemplateOutlet="dataTemplate;context:{$implicit: schema}"></ng-container>
+		</div>
+	</div>
+</ng-template>
+
+<ng-template #dataTemplate let-schema>
+	<div class="row" [class.bg-secondary]="!schema.present">
+		<ng-container [ngSwitch]="schema.type">
+			<ng-container *ngSwitchCase="'object'">
+				<strong *ngIf="schema.name.length" class="col-12 px-0">&nbsp;{{schema.name}}</strong>
+				<ng-container *ngIf="schema.present">
+					<div *ngFor="let subSchema of schema.objectSchema" class="col-12">
+						<ng-container *ngTemplateOutlet="entryTemplate;context:{$implicit: subSchema}"></ng-container>
+					</div>
+				</ng-container>
+			</ng-container>
+			<ng-container *ngSwitchCase="'array'">
+				<strong class="col-12">&nbsp;{{schema.name}}</strong>
+				<div *ngFor="let subSchema of schema.arraySchema; let index = index; let last = last;" class="col-12">
+					<ng-container *ngTemplateOutlet="entryTemplate;context:{$implicit: subSchema}"></ng-container>
+					<div class="row" *ngIf="subSchema.present">
+						<div class="col-2">&nbsp;</div>
+						<div class=" btn btn-secondary" [class.col-10]="!last" [class.col-5]="last" (click)="removeArrayItem(schema, index)">Remove</div>
+						<div *ngIf="last" class="col-5 btn btn-success" (click)="addArrayItem(schema)">Add new</div>
+					</div>
+					<div class="row" *ngIf="last && !subSchema.present">
+						<div class="col-1">&nbsp;</div>
+						<div *ngIf="last" class="col-11 btn btn-success" (click)="addArrayItem(schema)">Add new</div>
+					</div>
+				</div>
+			</ng-container>
+			<ng-container *ngSwitchCase="'number' || 'float'">
+				<strong class="col-6 px-0">&nbsp;{{schema.name}}</strong>
+				<input type="number" [(ngModel)]="schema.example" class="col-6"/>
+			</ng-container>
+			<ng-container *ngSwitchCase="'integer'">
+				<strong class="col-6 px-0">&nbsp;{{schema.name}}</strong>
+				<input type="number" [(ngModel)]="schema.example" class="col-6"/>
+			</ng-container>
+			<ng-container *ngSwitchCase="'string'">
+				<strong class="col-6 px-0">&nbsp;{{schema.name}}</strong>
+				<input type="text" [(ngModel)]="schema.example" class="col-6"/>
+			</ng-container>
+			<ng-container *ngSwitchCase="'boolean'">
+					<strong class="col-6 px-0">&nbsp;{{schema.name}}</strong>
+				<input type="checkbox" [(ngModel)]="schema.example" class="col-1">
+				<span class="col-5">{{schema.example}}</span>
+			</ng-container>
+			<ng-container *ngSwitchDefault>
+				WHAT!! {{schema.type}}
+			</ng-container>
+		</ng-container>
+	</div>
+</ng-template>

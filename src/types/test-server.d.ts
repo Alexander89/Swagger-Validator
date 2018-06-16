@@ -1,9 +1,9 @@
-import { Call } from '../app/models/swagger/swagger';
+import { Call } from '@swagger/calls';
 
 declare namespace TestServerApi {
 	type AvailableCommands =  'open' | 'close' | 'getCalls' | 'getCallData' | 'updatePath' | 'updateCallData' | 'event' ;
-	type AvailableDataTypes = CommandOpen | ReplyOpen | CommandUpdatePath | CallData | CallData[] | CommandUpdateCallData | EventMessage | undefined;
-	type EventTypes = 'close' | 'client' | 'server' | undefined;
+	type AvailableDataTypes = CommandOpen | ReplyOpen | CommandUpdatePath | CallData | CallData[] | CommandUpdateCallData | EventMessage | number | undefined;
+	type EventTypes = 'close' | 'admin' | 'client' | 'server' | undefined;
 	type MessageLvl = 'debug' | 'info' | 'warning' | 'error';
 
 	interface Command {
@@ -24,8 +24,8 @@ declare namespace TestServerApi {
 		path: string;
 	}
 	interface CommandUpdateCallData {
-		call: string;
-		jsonData: CallData;
+		callId: number;
+		config: CallConfigStructure;
 	}
 	interface EventMessage {
 		timestamp: number;

@@ -1,0 +1,13 @@
+.required {
+	color: red;
+}
+
+input[type=checkbox] {
+	height: 1.2rem;
+	width: 1.2rem;
+}
+
+input[type=radio] {
+	height: 1.3rem;
+	width: 1.3rem;
+}
