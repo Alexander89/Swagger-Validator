@@ -20,6 +20,9 @@ export class TesterComponent  {
 
 	/** info block from swagger call */
 	protected info: S.Info;
+	/** list of user entered host data */
+	public enteredHosts: Array<string> = [];
+
 
 	/** all open subscriptions to clean up on change the view */
 	private openSubscription: Subscription;
@@ -27,8 +30,24 @@ export class TesterComponent  {
 	constructor(private cd: ChangeDetectorRef, public swagger: Swagger, protected httpClient: HttpClient) {
 		this.openSubscription = undefined;
 		this.status = 'ready';
+
+		const hostList = localStorage.getItem('hostList');
+		if (hostList) {
+			this.enteredHosts = JSON.parse(hostList);
+		} else {
+			this.enteredHosts.push(swagger.def.host);
+		}
 	}
 
+	/**
+	 * when user leave the input field, save this input in the localStorage
+	 */
+	public saveHostEntry() {
+		if (this.enteredHosts.indexOf(this.swagger.def.host) === -1) {
+			this.enteredHosts.push(this.swagger.def.host);
+			localStorage.setItem('hostList', JSON.stringify(this.enteredHosts));
+		}
+	}
 
 	/**
 	 * Load the Json and return an observable to get the Swagger definition
