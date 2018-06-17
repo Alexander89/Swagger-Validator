@@ -1,8 +1,8 @@
 import { Call } from '@swagger/calls';
 
 declare namespace TestServerApi {
-	type AvailableCommands =  'open' | 'close' | 'getCalls' | 'getCallData' | 'updatePath' | 'updateCallData' | 'event' ;
-	type AvailableDataTypes = CommandOpen | ReplyOpen | CommandUpdatePath | CallData | CallData[] | CommandUpdateCallData | EventMessage | number | undefined;
+	type AvailableCommands =  'open' | 'close' | 'getCalls' | 'getCallData' | 'updatePath' | 'updateCallData' | 'event' | 'setSessionName' | 'changeSession';
+	type AvailableDataTypes = CommandOpen | ReplyOpen | CommandUpdatePath | CallData | CallData[] | CommandUpdateCallData | EventMessage | string | number | undefined;
 	type EventTypes = 'close' | 'admin' | 'client' | 'server' | undefined;
 	type MessageLvl = 'debug' | 'info' | 'warning' | 'error';
 

@@ -42,6 +42,8 @@ export class TestServer {
 			case 'getCallData':
 			case 'updatePath':
 			case 'updateCallData':
+			case 'setSessionName':
+			case 'changeSession':
 				if (call.command.command !== msg.command) {
 					return this.receiveMessage(ev);
 				}
@@ -117,8 +119,8 @@ export class TestServer {
 	 * Send the new configured call to the test-Server
 	 * @param data data to set on the server
 	 */
-	public setCallData(call: TestServerApi.CallData) {
-		return new Promise<any>((resolve, reject) => {
+	public setCallData(call: TestServerApi.CallData): Promise<TestServerApi.CallData> {
+		return new Promise<TestServerApi.CallData>((resolve, reject) => {
 			this.call('updateCallData', {config: call.jsonData, callId: call.id}).then(
 				rep => resolve(rep.reply as TestServerApi.CallData)
 			).catch(
@@ -126,6 +128,27 @@ export class TestServer {
 			);
 		});
 	}
+
+	public setSessionName(newName: string): Promise<void> {
+		return new Promise<void>((resolve, reject) => {
+			this.call('setSessionName', newName).then(
+				() => resolve()
+			).catch(
+				r => reject(r)
+			);
+		});
+	}
+
+	public changeSession(name: string): Promise<Array<TestServerApi.CallData>> {
+		return new Promise<Array<TestServerApi.CallData>>((resolve, reject) => {
+			this.call('changeSession', name).then(
+				rep => resolve(rep.reply as Array<TestServerApi.CallData>)
+			).catch(
+				r => reject(r)
+			);
+		});
+	}
+
 	/**
 	 * prepare and send a command to the server via the websocket
 	 * @param command command that should be sent

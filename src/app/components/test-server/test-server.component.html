@@ -3,9 +3,37 @@
 		<h2 class="col-12">Test-Server</h2>
 	</div>
 
-	<p class="row">
+	<div class="row">
 		<span class="col-12">Access link: http://{{source}}/{{sessionId}}/&lt;call&gt;</span>
-	</p>
+		<div class="col-12">
+			<div class="row">
+				<div class="col-4">
+					Make Permanent:
+				</div>
+				<div class="col-6">
+					<input type="text" [(ngModel)]="newSessionName" (keydown.enter)="setSessionName()" class="form-control"/>
+				</div>
+				<div class="col-2" (click)="setSessionName()">
+					<div class="btn btn-success d-block">
+						save
+					</div>
+				</div>
+			</div>
+			<div class="row">
+					<div class="col-4">
+						Switch Session:
+					</div>
+					<div class="col-6">
+						<input type="text" [(ngModel)]="selectedSessionName" (keydown.enter)="changeSession()" class="form-control"/>
+					</div>
+					<div class="col-2" (click)="changeSession()">
+						<div class="btn btn-success d-block">
+								set
+						</div>
+					</div>
+			</div>
+		</div>
+	</div>
 
 	<div class="row mb-3">
 		<div class="col-1">

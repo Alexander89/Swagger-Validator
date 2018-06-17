@@ -1,4 +1,4 @@
-import { Component, DoCheck, Input } from '@angular/core';
+import { Component, DoCheck, Input, ChangeDetectorRef } from '@angular/core';
 import { TestServer } from '@services/test-server/test-server.service';
 import { EventMessage, CallData, ReturnSchema } from 'types/test-server';
 import { Call, Response } from '@app/models/swagger/calls';
@@ -15,6 +15,9 @@ export class TestServerComponent implements DoCheck {
 	public sessionId: string;
 	public _connected: boolean;
 
+	public newSessionName: string;
+	public selectedSessionName: string;
+
 	public _selectedCall: number;
 	private _availableCalls = [] as Array<CallData>;
 	public currentCall: CallData;
@@ -22,7 +25,7 @@ export class TestServerComponent implements DoCheck {
 	private lastUpdate: string;
 	private autoSaveTimer: number;
 
-	constructor(private readonly server: TestServer) {}
+	constructor(private readonly server: TestServer, private readonly cD: ChangeDetectorRef) {}
 
 	ngDoCheck() {
 		if (this.currentCall) {
@@ -37,6 +40,26 @@ export class TestServerComponent implements DoCheck {
 		}
 	}
 
+	public setSessionName() {
+		this.server.setSessionName(this.newSessionName).then(
+			() => this.sessionId = this.newSessionName
+		).catch(
+			() => alert('it is not possible make a permanent session')
+		);
+	}
+	public changeSession() {
+		this.server.changeSession(this.selectedSessionName).then(
+			data => {
+				this.selectedCall = undefined;
+				this.sessionId = this.selectedSessionName;
+				this.applyAvailableCalls(data);
+				this.cD.markForCheck();
+			}
+		).catch(
+			() => alert(`Session ${this.selectedSessionName} was not found`)
+		);
+	}
+
 	public getCurrentReturnSchema(type: string): ReturnSchema { return this.currentCall.jsonData.returnStructures[type]; }
 
 	public removeArrayItem(schema: ReturnSchema, index: number) {
@@ -49,7 +72,6 @@ export class TestServerComponent implements DoCheck {
 	public addArrayItem(schema: ReturnSchema) {
 		schema.arraySchema.push(this.deepCopy(schema.arraySchema[schema.arraySchema.length - 1]));
 	}
-
 
 	private deepCopy(obj) {
 		// Copy Date
@@ -77,6 +99,14 @@ export class TestServerComponent implements DoCheck {
 	public applyCall() {
 		this.server.setCallData(this.currentCall).catch(e => alert('it is not possible to set the call data'));
 	}
+
+	public applyAvailableCalls(calls: Array<CallData>) {
+		this._availableCalls = calls;
+		this._availableCalls.forEach(call => {
+			Object.getOwnPropertyNames(call.call.responses).forEach(res => call.call.responses[res].name = res);
+		});
+	}
+
 	/** clear the local log storage */
 	public clearLog() { this.server.clearLog(); }
 
@@ -86,12 +116,7 @@ export class TestServerComponent implements DoCheck {
 			this.server.setServer('ws://' + this.source, this.path).then(id => {
 				this.sessionId = id;
 				this._connected = true;
-				this.server.getAvailableCalls().then(calls => {
-					this._availableCalls = calls;
-					this._availableCalls.forEach(call => {
-						Object.getOwnPropertyNames(call.call.responses).forEach(res => call.call.responses[res].name = res);
-					});
-				});
+				this.server.getAvailableCalls().then(calls => this.applyAvailableCalls(calls));
 			});
 		} else {
 			this.server.disconnect().then((c) => this._connected = false);
@@ -104,14 +129,7 @@ export class TestServerComponent implements DoCheck {
 	get selectedCall(): number { return this._selectedCall; }
 	set selectedCall(value) {
 		this._selectedCall = +value;
-		const data = this.availableCalls.find(c => c.id === this._selectedCall);
-		if (data) {
-			try {
-				this.currentCall = data;
-			} catch (e) {
-				console.error('can not parse JSON ' + e);
-			}
-		}
+		this.currentCall = this.availableCalls.find(c => c.id === this._selectedCall);
 	}
 
 	get responses(): Array<Response> {
