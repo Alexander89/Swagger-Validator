@@ -18,7 +18,7 @@ declare namespace TestServerApi {
 		path: string;
 	}
 	interface ReplyOpen {
-		sessionID: number;
+		sessionID: string;
 	}
 	interface CommandUpdatePath {
 		path: string;

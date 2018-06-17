@@ -12,7 +12,7 @@ import { isArray } from 'util';
 export class TestServerComponent implements DoCheck {
 	@Input() source: string;
 	@Input() path: string;
-	public sessionId: number;
+	public sessionId: string;
 	public _connected: boolean;
 
 	public _selectedCall: number;

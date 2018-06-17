@@ -14,7 +14,7 @@ interface Calls {
 @Injectable()
 export class TestServer {
 	private _address: string;
-	private _sessionID: number;
+	private _sessionID: string;
 	private s: WebSocket;
 	private calls = [] as Array<Calls>;
 	private _log = [] as Array<TestServerApi.EventMessage>;
@@ -83,7 +83,7 @@ export class TestServer {
 	 * @param address address of the server
 	 * @param path path for the JSON definition
 	 */
-	public setServer(address: string, path: string): Promise<number> {
+	public setServer(address: string, path: string): Promise<string> {
 		this._address = address;
 		this.s = new WebSocket(address);
 
@@ -91,7 +91,7 @@ export class TestServer {
 		this.s.addEventListener('error', ev => this.errorEvent(ev));
 		this.s.addEventListener('close', () => this.closeEvent());
 
-		return new Promise<number>((resolve, reject) => {
+		return new Promise<string>((resolve, reject) => {
 			this.s.addEventListener('open', (ev: Event) => {
 				this.call('open', { path }).then(call => {
 					this._sessionID = (call.reply as TestServerApi.ReplyOpen).sessionID;
