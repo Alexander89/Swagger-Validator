@@ -26,7 +26,6 @@ export class TestServer {
 			return;
 		}
 		const msg = JSON.parse(ev.data) as TestServerApi.Command;
-		console.log(`msg.command ${msg.command}`);
 
 		let call: Calls;
 		if (msg.command !== 'event') {
@@ -99,6 +98,9 @@ export class TestServer {
 					this._sessionID = (call.reply as TestServerApi.ReplyOpen).sessionID;
 					resolve(this._sessionID);
 				}).catch(r => reject(r));
+			});
+			this.s.addEventListener('close', () => {
+				reject('socket closed');
 			});
 		});
 	}

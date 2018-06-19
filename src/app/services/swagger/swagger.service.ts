@@ -125,7 +125,9 @@ export class Swagger {
 					method.call.callName = callGroup.callName;
 					method.call.method = method.method;
 					method.call.values = {};
-					method.call.parameters.forEach(p => method.call.values[p.name] = p.default || '');
+					if (method.call.parameters) {
+						method.call.parameters.forEach(p => method.call.values[p.name] = p.default || '');
+					}
 					Object.getOwnPropertyNames(method.call.responses).forEach(r => {
 						if (method.call.responses[r].schema && method.call.responses[r].schema.$ref) {
 							method.call.responses[r].refName = method.call.responses[r].schema.$ref;

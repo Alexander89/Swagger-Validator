@@ -30,13 +30,6 @@ export class TesterComponent  {
 	constructor(private cd: ChangeDetectorRef, public swagger: Swagger, protected httpClient: HttpClient) {
 		this.openSubscription = undefined;
 		this.status = 'ready';
-
-		const hostList = localStorage.getItem('hostList');
-		if (hostList) {
-			this.enteredHosts = JSON.parse(hostList);
-		} else {
-			this.enteredHosts.push(swagger.def.host);
-		}
 	}
 
 	/**
@@ -80,7 +73,7 @@ export class TesterComponent  {
 	 */
 	public trackCall(index, call) { return call.callName; }
 	/**
-	 * Methode tracker for the ngFor loop
+	 * Method tracker for the ngFor loop
 	 * @param index index of the item
 	 * @param method Method to be tracked
 	 */
@@ -105,6 +98,13 @@ export class TesterComponent  {
 				this.info = body.info;
 				this.status = 'JSON loaded';
 				this.selectedScheme = body.schemes[0];
+
+				const hostList = localStorage.getItem('hostList');
+				if (hostList) {
+					this.enteredHosts = JSON.parse(hostList);
+				} else {
+					this.enteredHosts.push(body.host);
+				}
 			} catch (e) {
 				this.status = `invalid JSON ${e}`;
 			}

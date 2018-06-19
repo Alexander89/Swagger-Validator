@@ -113,10 +113,11 @@ export class TestServerComponent implements DoCheck {
 	get connect() { return this._connected; }
 	@Input('connect') set connect(value: boolean) {
 		if (value) {
-			this.server.setServer('ws://' + this.source, this.path).then(id => {
+			const address = this.source.replace('http://', 'ws://').replace('https://', 'wss://');
+			this.server.setServer(address, this.path).then(id => {
 				this.sessionId = id;
 				this._connected = true;
-				this.server.getAvailableCalls().then(calls => this.applyAvailableCalls(calls));
+				this.server.getAvailableCalls().then(calls => this.applyAvailableCalls(calls)).catch(() => this._connected = false);
 			});
 		} else {
 			this.server.disconnect().then((c) => this._connected = false);
