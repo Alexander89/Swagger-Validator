@@ -4,41 +4,30 @@
 		<div class="col-12">
 			<h2>{{title}}</h2>
 		</div>
-
 		<div class="col-md-6">
-			<div class="row">
-				<div class="col-md-12">
-					<label for="source" class="form-label">Source</label>
-				</div>
-				<div class="col-12">
-					<input type="text" name="source" id="source" class="form-control" [(ngModel)]="source">
-				</div>
-			</div>
+			<label for="source" class="form-label">Source</label>
+			<input type="text" name="source" id="source" class="form-control" [(ngModel)]="source">
 		</div>
 		<div class="col-md-6">
-			<div class="row">
-				<div class="col-md-4">
-					<label for="source" class="form-label">Test Server</label>
-				</div>
-				<div class="col-12">
-					<input type="text" name="source" id="source" class="form-control" [(ngModel)]="testServer">
-				</div>
-				<div class="col-12">
-					<div class="btn btn-primary" (click)="showServer = !showServer">
-						Connect
-					</div>
-				</div>
-			</div>
+			{{status}}
 		</div>
 	</div>
 </div>
-<div class="container-fluid">
-	<div class="row">
-		<div class="col-12 mx-0 px-0" [class.col-lg-6]="showServer">
-			<app-tester [source]="source"></app-tester>
+<div class="container-fluid my-3">
+	<ul class="nav nav-tabs nav-fill">
+		<li class="nav-item">
+			<a class="nav-link" [class.active]="activeTab == 'main'" (click)="activeTab='main'">Definition / Try</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" [class.active]="activeTab == 'testServer'" (click)="activeTab='testServer'">Test-Server</a>
+		</li>
+	</ul>
+	<div class="row mx-0 py-3 border border-top-0">
+		<div [class.d-none]="activeTab !== 'main'" class="col-12">
+			<app-tester [source]="source" (status)="onStatusChanged($event)"></app-tester>
 		</div>
-		<div *ngIf="showServer" class="col-lg-6 pl-0 mx-0">
-			<app-test-server [path]="source" [source]="testServer" [connect]="showServer"></app-test-server>
+		<div [class.d-none]="activeTab !== 'testServer'" class="col-12">
+			<app-test-server [path]="source"></app-test-server>
 		</div>
 	</div>
 </div>

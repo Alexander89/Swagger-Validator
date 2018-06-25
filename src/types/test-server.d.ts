@@ -1,8 +1,8 @@
 import { Call } from '@swagger/calls';
 
 declare namespace TestServerApi {
-	type AvailableCommands =  'open' | 'close' | 'getCalls' | 'getCallData' | 'updatePath' | 'updateCallData' | 'event' | 'setSessionName' | 'changeSession';
-	type AvailableDataTypes = CommandOpen | ReplyOpen | CommandUpdatePath | CallData | CallData[] | CommandUpdateCallData | EventMessage | string | number | undefined;
+	type AvailableCommands =  'open' | 'close' | 'getCalls' | 'getCallData' | 'updatePath' | 'updateCallData' | 'upgradeCall' | 'event' | 'setSessionName' | 'changeSession';
+	type AvailableDataTypes = CommandOpen | ReplyOpen | CommandUpdatePath | CallData | CallData[] | CommandUpdateCallData | UpgradeCallData | EventMessage | string | number | undefined;
 	type EventTypes = 'close' | 'admin' | 'client' | 'server' | undefined;
 	type MessageLvl = 'debug' | 'info' | 'warning' | 'error';
 
@@ -12,7 +12,6 @@ declare namespace TestServerApi {
 		data?: AvailableDataTypes;
 		replyState?: 'ok' | 'error';
 	}
-
 
 	interface CommandOpen {
 		path: string;
@@ -26,6 +25,11 @@ declare namespace TestServerApi {
 	interface CommandUpdateCallData {
 		callId: number;
 		config: CallConfigStructure;
+	}
+	interface UpgradeCallData {
+		path: string;
+		callName: string;
+		method: string;
 	}
 	interface EventMessage {
 		timestamp: number;

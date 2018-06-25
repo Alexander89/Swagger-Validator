@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as TestServerApi from 'types/test-server';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 interface Calls {
 	command: TestServerApi.Command;
@@ -18,6 +19,11 @@ export class TestServer {
 	private s: WebSocket;
 	private calls = [] as Array<Calls>;
 	private _log = [] as Array<TestServerApi.EventMessage>;
+
+	private readonly _closeConnectionSource = new BehaviorSubject<boolean>(false);
+	/** observable to subscribe to new server connection closed */
+	public closeConnection = this._closeConnectionSource.asObservable();
+
 	constructor() {
 
 	}
@@ -63,6 +69,7 @@ export class TestServer {
 	private errorEvent(ev: Event) {
 	}
 	private closeEvent() {
+		this._closeConnectionSource.next(true);
 	}
 
 	/**
@@ -145,6 +152,21 @@ export class TestServer {
 		return new Promise<Array<TestServerApi.CallData>>((resolve, reject) => {
 			this.call('changeSession', name).then(
 				rep => resolve(rep.reply as Array<TestServerApi.CallData>)
+			).catch(
+				r => reject(r)
+			);
+		});
+	}
+
+	public upgradeCall(path: string, call: TestServerApi.CallData) {
+		const data = {
+			path,
+			callName: call.callName,
+			method: call.method
+		} as TestServerApi.UpgradeCallData;
+		return new Promise((resolve, reject) => {
+			this.call('changeSession', data).then(
+				() => resolve()
 			).catch(
 				r => reject(r)
 			);

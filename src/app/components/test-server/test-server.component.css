@@ -11,3 +11,9 @@ input[type=radio] {
 	height: 1.3rem;
 	width: 1.3rem;
 }
+
+.requiredEntry:after {
+	content: '*';
+	color: red;
+	padding-left: 1.3rem;
+}

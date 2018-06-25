@@ -9,21 +9,16 @@ export class AppComponent {
 	/** title for the Application */
 	public readonly title = 'Swagger-Validator';
 	private _source: string;
-	private _testServer: string;
-	public showServer: boolean;
+	public activeTab = 'main';
+
+	public status = '';
 
 	constructor() {
-		const hostname = localStorage.getItem('hostName');
-		if (hostname) {
-			this._source = hostname;
-		}
-		const server = localStorage.getItem('testServer');
-		if (server) {
-			this._testServer = server;
-		}
+		this._source = localStorage.getItem('hostName') || '';
 	}
 
-	/** set the source to the template and update the localStore */
+
+	/** set the testServer to the template and update the localStore */
 	set source(src: string) {
 		localStorage.setItem('hostName', src);
 		this._source = src;
@@ -31,12 +26,11 @@ export class AppComponent {
 	/** set the JSON source */
 	get source(): string { return this._source; }
 
-
-	/** set the testServer to the template and update the localStore */
-	set testServer(src: string) {
-		localStorage.setItem('testServer', src);
-		this._testServer = src;
+	/**
+	 * validation status from the test component to show in the header
+	 * @param status status to show up
+	 */
+	onStatusChanged(status: string) {
+		this.status = status;
 	}
-	/** set the JSON source */
-	get testServer(): string { return this._testServer; }
 }

@@ -1,131 +1,191 @@
 <div class="container-fluid">
 	<div class="row">
-		<h2 class="col-12">Test-Server</h2>
-	</div>
-
-	<div class="row">
-		<span class="col-12">Access link: {{source}}/{{sessionId}}/&lt;call&gt;</span>
+		<div class="col-md-4">
+			<label for="source" class="form-label">Test Server</label>
+		</div>
 		<div class="col-12">
-			<div class="row">
-				<div class="col-4">
-					Make Permanent:
-				</div>
-				<div class="col-6">
-					<input type="text" [(ngModel)]="newSessionName" (keydown.enter)="setSessionName()" class="form-control"/>
-				</div>
-				<div class="col-2" (click)="setSessionName()">
-					<div class="btn btn-success d-block">
-						save
+			<div class="input-group mb-3">
+				<div class="input-group-prepend">
+					<button class="btn btn-outline-secondary dropdown-toggle" type="button" [disabled]="connected" (click)="!connected && (showSchemePopup = !showSchemePopup)">{{scheme}}</button>
+					<div class="dropdown-menu" [class.d-block]="showSchemePopup">
+						<a class="dropdown-item" (click)="scheme='http'; showSchemePopup = false;">http://</a>
+						<a class="dropdown-item" (click)="scheme='https'; showSchemePopup = false;">https://</a>
 					</div>
+				</div>
+				<input type="text " class="form-control" [disabled]="connected" [(ngModel)]="source">
+				<div class="input-group-append">
+					<div *ngIf="!connected" class="btn btn-outline-primary" (click)="connect()">Connect</div>
+					<div *ngIf="connected" class="btn btn-outline-danger" (click)="connect()">Disconnect</div>
 				</div>
 			</div>
-			<div class="row">
-					<div class="col-4">
-						Switch Session:
-					</div>
-					<div class="col-6">
-						<input type="text" [(ngModel)]="selectedSessionName" (keydown.enter)="changeSession()" class="form-control"/>
-					</div>
-					<div class="col-2" (click)="changeSession()">
-						<div class="btn btn-success d-block">
-								set
-						</div>
-					</div>
-			</div>
+			<div class="invalid-feedback d-block">{{connectError}}</div>
+		</div>
+		<div class="col-12">
 		</div>
 	</div>
 
-	<div class="row mb-3">
-		<div class="col-1">
-			<strong>Call:</strong>
-		</div>
-		<div class="col-11">
-			<select name="callSelect" [(ngModel)]="selectedCall" style="max-width: 100%">
-				<option *ngFor="let call of availableCalls; trackBy: trackAvCalls" value="{{call.id}}">{{call.id}} {{call.method}} {{call.callName}}</option>
-			</select>
-		</div>
-	</div>
-
-	<div class="row">
-		<div *ngIf="currentCall" class="card" style="width: 100%">
-			<div class="card-header">
-				<div><div class="badge">{{currentCall?.method}}</div> {{currentCall?.callName}}</div>
-			</div>
-			<div class="card-body">
-				<div *ngFor="let res of responses; trackBy: trackResponses" class="row">
-					<div class="card col-12">
-						<div class="row card-header">
-							<div class="col-12 px-0">
-								<input type="radio" name="selRes" [(ngModel)]="selectedResult" value={{res?.name}}/>
-								<strong>{{res?.name}}</strong>
-								{{res?.description}}
+	<ng-container *ngIf="connected">
+		<div class="row">
+			<div class="col-12">
+				<div class="card mb-3">
+					<div class="card-header dropdown-toggle" (click)="showSessionConfig = !showSessionConfig">Host: {{scheme}}://{{source}}/{{sessionId}}/[call]</div>
+					<div *ngIf="showSessionConfig" class="card-body">
+						<div *ngIf="isPermanent" class="row">
+							<div class="col-12 mb-2">
+								<div class="btn-group" role="group">
+									<div class="btn btn-outline-primary px-3" (click)="newSession()">New</div>
+									<div class="btn btn-outline-primary px-3" (click)="copySession()">Copy</div>
+									<div class="btn btn-outline-primary px-3" (click)="sessionManagerMode = 'delete'">Delete</div>
+									<div class="btn btn-outline-primary px-3" (click)="openUpdateCall()">Update / add route</div>
+								</div>
+							</div>
+							<div *ngIf="manageRouteError" class="col-12">
+								<div class="alert alert-danger" role="alert">
+									Session Error: {{manageRouteError}}
+								</div>
+								<a class="btn btn-outline-success" (click)="manageRouteError = ''">OK</a>
 							</div>
 						</div>
-						<div *ngIf="res?.name === selectedResult && getCurrentReturnSchema(res.name)" class="card-body">
-							<ng-container *ngTemplateOutlet="dataTemplate;context:{$implicit: getCurrentReturnSchema(res.name)}"></ng-container>
+						<ng-container [ngSwitch]="sessionManagerMode">
+							<ng-container *ngSwitchCase="''">
+								<div class="row mb-1">
+									<div *ngIf="!isPermanent" class="col-4 col-md-2">Make Permanent:</div>
+									<div *ngIf="isPermanent" class="col-4 col-md-2">Rename:</div>
+									<div class="col-8 col-md-10">
+										<div class="input-group">
+											<input type="text" [(ngModel)]="newSessionName" (keydown.enter)="setSessionName()" class="form-control"/>
+											<div class="input-group-append">
+												<a class="btn btn-outline-success d-block" (click)="setSessionName()">Save</a>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-4 col-md-2">Switch Session:</div>
+									<div class="col-8 col-md-10">
+										<div class="input-group">
+											<input type="text" [(ngModel)]="selectedSessionName" (keydown.enter)="changeSession()" class="form-control"/>
+											<div class="input-group-append">
+												<a class="btn btn-outline-success d-block" (click)="changeSession()">Set</a>
+											</div>
+										</div>
+									</div>
+								</div>
+							</ng-container>
+							<ng-container *ngSwitchCase="'delete'">
+								<div class="mb-3">
+									Please confirm that you like to delete the Session {{sessionId}}.
+									<div class="btn-group" role="group">
+										<button type="button" class="btn btn-danger" (click)="deleteSession()">DELETE!</button>
+										<button type="button" class="btn btn-outline-success" (click)="sessionManagerMode = ''">Cancel</button>
+									</div>
+								</div>
+							</ng-container>
+							<ng-container *ngSwitchCase="'update'">
+								<div class="row mb-1">
+									Add/Overwrite API-Route:
+									<div class="input-group">
+										<select name="updateCall" [(ngModel)]="updateCall" class="custom-select">
+											<option *ngIf="updateCall == -1" value="-1" selected>Select an API route</option>
+											<option *ngFor="let call of newCalls; trackBy: trackAvCalls; let idx = index" value="{{idx}}">{{call.method}} {{call.callName}}</option>
+										</select>
+										<div class="input-group-append">
+											<a class="btn btn-outline-success d-block" (click)="updateCallNow()">Update/Add</a>
+											<a class="btn btn-outline-danger" (click)="sessionManagerMode = ''; updateCall = -1;">Cancel</a>
+										</div>
+									</div>
+								</div>
+							</ng-container>
+						</ng-container>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row mb-3">
+			<div class="col-1">
+				<strong>Routes:</strong>
+			</div>
+			<div class="col-11">
+				<select name="callSelect" class="custom-select" [(ngModel)]="selectedCall">
+					<option *ngIf="selectedCall == -1" value="-1" selected>Select an API route</option>
+					<option *ngFor="let call of availableCalls; trackBy: trackAvCalls" value="{{call.id}}">{{call.id}} {{call.method}} {{call.callName}}</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="row mb-3">
+			<div *ngIf="currentCall" class="card" style="width: 100%">
+				<div class="card-header">
+					<div><div class="badge">{{currentCall?.method}}</div> {{currentCall?.callName}}</div>
+				</div>
+				<div class="card-body">
+					<div *ngFor="let res of responses; trackBy: trackResponses" class="row">
+						<div class="card col-12">
+							<div class="row card-header">
+								<div class="col-12 px-0">
+									<input type="radio" name="selRes" [(ngModel)]="selectedResult" value={{res?.name}}/>
+									<strong>{{res?.name}}</strong>
+									{{res?.description}}
+								</div>
+							</div>
+							<div *ngIf="res?.name === selectedResult && getCurrentReturnSchema(res.name)" class="card-body">
+								<ng-container *ngTemplateOutlet="dataTemplate;context:{$implicit: getCurrentReturnSchema(res.name)}"></ng-container>
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-			<div class="card-footer">
-				<div class="row">
-					<div class="col-7">$nbsp;</div>
-					<div class="col-5 btn btn-success" (click)="applyCall()">apply Data</div>
+				<div class="card-footer">
+					<div class="row">
+						<div class="col-7">&nbsp;</div>
+						<div class="col-5 btn btn-success" (click)="applyCall()">apply Data</div>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
 
-	<div class="row">
-		<div class="col-12">
-			<div class="card">
-				<div class="card-header">
-				<div class="row">
-					<div class="col-10 h4">
-						Log
+		<div class="row mb-3">
+			<div class="col-12">
+				<div class="card">
+					<div class="card-header">
+						<div class="row">
+							<div class="col-6 h4">Log</div>
+							<div class="col-6 text-right">
+								<div class="btn btn-secondary block" (click)="clearLog()">clear</div>
+							</div>
+						</div>
 					</div>
-					<div class="col-2">
-						<div class="btn btn-secondary block" (click)="clearLog()">clear</div>
-					</div>
-				</div>
-			</div>
-			<div class="card-body">
-				<div class="row">
-					<div class="col-3">
-						Time
-					</div>
-					<div class="col-7">
-						Message
-					</div>
-					<div class="col-2">
-						lvl
-					</div>
-				</div>
-				<div *ngFor="let row of log" class="row">
-					<div class="col-3">
-						{{row.timestamp | date:'HH:mm:ss,S'}}
-					</div>
-					<div class="col-7">
-						{{row.message}}
-					</div>
-					<div class="col-2">
-						{{row.lvl}}
+					<div class="card-body">
+						<table class="table table-sm">
+							<thead>
+								<tr>
+									<th scope="col">Time</th>
+									<th scope="col">Message</th>
+									<th scope="col">LVL</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr *ngFor="let row of log">
+									<th scope="row">{{row.timestamp | date:'HH:mm:ss,S'}}</th>
+									<td>{{row.message}}</td>
+									<td>{{row.lvl}}</td>
+								</tr>
+							</tbody>
+						</table>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
+	</ng-container>
 </div>
 
-
 <ng-template #entryTemplate let-schema>
-	<div class="row">
-		<div class="col-1 px-0">
-			<input type="checkbox" [(ngModel)]="schema.present"/>
-			<span *ngIf="schema.required" class="mr-1" class="required">*</span>
-		</div>
-		<div class="col-11">
-			<ng-container *ngTemplateOutlet="dataTemplate;context:{$implicit: schema}"></ng-container>
+	<div class="entryTemplate">
+		<input type="checkbox" class="float-left" [class.requiredEntry]="schema.required" [(ngModel)]="schema.present"/>
+		<div class="ml-4">
+			<div class="container-fluid px-0">
+				<ng-container *ngTemplateOutlet="dataTemplate;context:{$implicit: schema}"></ng-container>
+			</div>
 		</div>
 	</div>
 </ng-template>
@@ -134,7 +194,7 @@
 	<div class="row" [class.bg-secondary]="!schema.present">
 		<ng-container [ngSwitch]="schema.type">
 			<ng-container *ngSwitchCase="'object'">
-				<strong *ngIf="schema.name.length" class="col-12 px-0">&nbsp;{{schema.name}}</strong>
+				<strong *ngIf="schema.name.length" class="col-12 pl-3 pr-0">&nbsp;{{schema.name}}</strong>
 				<ng-container *ngIf="schema.present">
 					<div *ngFor="let subSchema of schema.objectSchema" class="col-12">
 						<ng-container *ngTemplateOutlet="entryTemplate;context:{$implicit: subSchema}"></ng-container>
@@ -142,7 +202,7 @@
 				</ng-container>
 			</ng-container>
 			<ng-container *ngSwitchCase="'array'">
-				<strong class="col-12">&nbsp;{{schema.name}}</strong>
+				<strong class="col-12 pl-3">&nbsp;{{schema.name}}</strong>
 				<div *ngFor="let subSchema of schema.arraySchema; let index = index; let last = last;" class="col-12">
 					<ng-container *ngTemplateOutlet="entryTemplate;context:{$implicit: subSchema}"></ng-container>
 					<div class="row" *ngIf="subSchema.present">
@@ -157,19 +217,19 @@
 				</div>
 			</ng-container>
 			<ng-container *ngSwitchCase="'number' || 'float'">
-				<strong class="col-6 px-0">&nbsp;{{schema.name}}</strong>
+				<strong class="col-6 pl-3 pr-0">&nbsp;{{schema.name}}</strong>
 				<input type="number" [(ngModel)]="schema.example" class="col-6"/>
 			</ng-container>
 			<ng-container *ngSwitchCase="'integer'">
-				<strong class="col-6 px-0">&nbsp;{{schema.name}}</strong>
+				<strong class="col-6 pl-3 pr-0">&nbsp;{{schema.name}}</strong>
 				<input type="number" [(ngModel)]="schema.example" class="col-6"/>
 			</ng-container>
 			<ng-container *ngSwitchCase="'string'">
-				<strong class="col-6 px-0">&nbsp;{{schema.name}}</strong>
+				<strong class="col-6 pl-3 pr-0">&nbsp;{{schema.name}}</strong>
 				<input type="text" [(ngModel)]="schema.example" class="col-6"/>
 			</ng-container>
 			<ng-container *ngSwitchCase="'boolean'">
-					<strong class="col-6 px-0">&nbsp;{{schema.name}}</strong>
+					<strong class="col-6 pl-3 pr-0">&nbsp;{{schema.name}}</strong>
 				<input type="checkbox" [(ngModel)]="schema.example" class="col-1">
 				<span class="col-5">{{schema.example}}</span>
 			</ng-container>
