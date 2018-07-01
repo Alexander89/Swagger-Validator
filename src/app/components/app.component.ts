@@ -20,6 +20,7 @@ export class AppComponent {
 
 	/** set the testServer to the template and update the localStore */
 	set source(src: string) {
+		src = `${src}`.trim();
 		localStorage.setItem('hostName', src);
 		this._source = src;
 	}

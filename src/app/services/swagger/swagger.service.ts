@@ -14,7 +14,7 @@ export class Swagger {
 
 	/**
 	 * resolve all reference tags and set the models in the calls and Responses
-	 * @param def Rood for the swagger definition
+	 * @param this.def Rood for the swagger definition
 	 */
 	public static resolveRef(def: S.Root): S.Root {
 		let strDef = JSON.stringify(def);
@@ -239,8 +239,9 @@ export class Swagger {
 	 * @param call Swagger defined call to do the request
 	 */
 	private makeRequest(call: S.Call) {
-		const def = this.def;
-		const base = `${this.selectedRequestScheme}://${def.host}${def.basePath}`;
+		this.def.host = `${this.def.host}`.trim();
+		this.def.basePath = `${this.def.basePath}`.trim();
+		const base = `${this.selectedRequestScheme}://${this.def.host}${this.def.basePath}`;
 		let body = null;
 		let header = new HttpHeaders('test = 1');
 		let query = '';
