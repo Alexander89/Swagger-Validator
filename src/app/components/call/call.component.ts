@@ -64,8 +64,6 @@ export class CallComponent {
 
 		this.swagger.procRequest(this.call).subscribe(v => {
 			this.showResult = true;
-			console.log(typeof v);
-			console.log(v);
 
 			if (typeof v === 'string') {
 				this.status = v;
