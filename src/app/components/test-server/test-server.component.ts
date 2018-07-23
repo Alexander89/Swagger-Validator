@@ -72,9 +72,14 @@ export class TestServerComponent implements OnInit, DoCheck {
 
 	public setSessionName() {
 		this.server.setSessionName(this.newSessionName).then(
-			() => this.sessionId = this.newSessionName
+			() => {
+				this.selectedCall = undefined;
+				this.sessionId = this.newSessionName;
+				this.showSessionConfig = false;
+				this.cD.markForCheck();
+			}
 		).catch(
-			() => alert('it is not possible make a permanent session')
+			() => this.manageRouteError = 'it is not possible make a permanent session'
 		);
 	}
 	public changeSession() {
@@ -82,11 +87,12 @@ export class TestServerComponent implements OnInit, DoCheck {
 			data => {
 				this.selectedCall = undefined;
 				this.sessionId = this.selectedSessionName;
+				this.showSessionConfig = false;
 				this.applyAvailableCalls(data);
 				this.cD.markForCheck();
 			}
 		).catch(
-			() => alert(`Session ${this.selectedSessionName} was not found`)
+			() => this.manageRouteError = `Session ${this.selectedSessionName} was not found`
 		);
 	}
 
@@ -130,7 +136,13 @@ export class TestServerComponent implements OnInit, DoCheck {
 
 	public updateCallNow() {
 		if (this.updateCall !== -1) {
-			this.server.upgradeCall(this.path, this.newCalls[this.updateCall]).catch(() => alert('it is not possible to set the call data'));
+			this.server.upgradeCall(this.path, this.newCalls[this.updateCall])
+			.then(calls => {
+				this.selectedCall = undefined;
+				this.applyAvailableCalls(calls);
+				this.cD.markForCheck();
+			})
+			.catch(() => alert('it is not possible to set the call data'));
 		}
 	}
 

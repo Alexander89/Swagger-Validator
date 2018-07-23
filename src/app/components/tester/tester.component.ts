@@ -15,6 +15,7 @@ export class TesterComponent  {
 	private _source: string;
 	/** http status for get call */
 	public _status: string;
+	/** out bound status event emitter */
 	@Output() status = new EventEmitter<string>();
 
 

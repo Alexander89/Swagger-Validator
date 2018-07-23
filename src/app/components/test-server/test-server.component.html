@@ -31,7 +31,7 @@
 					<div class="card-header dropdown-toggle" (click)="showSessionConfig = !showSessionConfig">Host: {{scheme}}://{{source}}/{{sessionId}}/[call]</div>
 					<div *ngIf="showSessionConfig" class="card-body">
 						<div *ngIf="isPermanent" class="row">
-							<div class="col-12 mb-2">
+							<div class="d-none col-12 mb-2">
 								<div class="btn-group" role="group">
 									<div class="btn btn-outline-primary px-3" (click)="newSession()">New</div>
 									<div class="btn btn-outline-primary px-3" (click)="copySession()">Copy</div>
@@ -39,10 +39,10 @@
 									<div class="btn btn-outline-primary px-3" (click)="openUpdateCall()">Update / add route</div>
 								</div>
 							</div>
-							<div *ngIf="manageRouteError" class="col-12">
-								<div class="alert alert-danger" role="alert">
-									Session Error: {{manageRouteError}}
-								</div>
+						</div>
+						<div *ngIf="manageRouteError" class="col-12">
+							<div class="alert alert-danger" role="alert">
+								Session Error: {{manageRouteError}}
 								<a class="btn btn-outline-success" (click)="manageRouteError = ''">OK</a>
 							</div>
 						</div>

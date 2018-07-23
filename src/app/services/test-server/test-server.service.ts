@@ -2,13 +2,21 @@ import { Injectable } from '@angular/core';
 import * as TestServerApi from 'types/test-server';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
+/** interface for calls to the testServer */
 interface Calls {
+	/** requested command to execute on the server */
 	command: TestServerApi.Command;
+	/** callback, when command was executed */
 	resolve?: (value?: Calls) => void;
+	/** callback, when commend was failed */
 	reject?: (reason?: any) => void;
+	/** data, send back from Test-Server */
 	reply?: TestServerApi.AvailableDataTypes;
+	/** status of the reply ok or error */
 	replyState?: 'ok' | 'error';
+	/** time, when the request was send */
 	timeStamp?: number;
+	/** duration how long the request toke */
 	duration?: number;
 }
 
@@ -27,6 +35,10 @@ export class TestServer {
 	constructor() {
 
 	}
+	/**
+	 * handle the incoming messages for the websocket
+	 * @param ev Message event with the data
+	 */
 	private receiveMessage(ev: MessageEvent) {
 		if (ev.data === 'o') {
 			return;
@@ -66,8 +78,15 @@ export class TestServer {
 				break;
 		}
 	}
+	/**
+	 * Event handler, when something bad happend on the socked
+	 * @param ev error event
+	 */
 	private errorEvent(ev: Event) {
 	}
+	/**
+	 * event handler, when the socket closed the connection
+	 */
 	private closeEvent() {
 		this._closeConnectionSource.next(true);
 	}
@@ -138,6 +157,10 @@ export class TestServer {
 		});
 	}
 
+	/**
+	 * update the name of an permanent session by sending the setSessionName command to the server
+	 * @param newName new session name to store it in the database
+	 */
 	public setSessionName(newName: string): Promise<void> {
 		return new Promise<void>((resolve, reject) => {
 			this.call('setSessionName', newName).then(
@@ -148,6 +171,10 @@ export class TestServer {
 		});
 	}
 
+	/**
+	 * send the changeSession to the server, to switch to an other session
+	 * @param name session to switch to
+	 */
 	public changeSession(name: string): Promise<Array<TestServerApi.CallData>> {
 		return new Promise<Array<TestServerApi.CallData>>((resolve, reject) => {
 			this.call('changeSession', name).then(
@@ -158,15 +185,20 @@ export class TestServer {
 		});
 	}
 
+	/**
+	 * update a call on the Test-Server
+	 * @param path Path to he JSON file to load the data from
+	 * @param call call to be updated
+	 */
 	public upgradeCall(path: string, call: TestServerApi.CallData) {
 		const data = {
 			path,
 			callName: call.callName,
 			method: call.method
 		} as TestServerApi.UpgradeCallData;
-		return new Promise((resolve, reject) => {
-			this.call('changeSession', data).then(
-				() => resolve()
+		return new Promise<Array<TestServerApi.CallData>>((resolve, reject) => {
+			this.call('upgradeCall', data).then(
+				rep => resolve(rep.reply as Array<TestServerApi.CallData>)
 			).catch(
 				r => reject(r)
 			);
