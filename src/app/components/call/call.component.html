@@ -34,8 +34,7 @@
 						Description
 					</strong>
 				</div>
-				<div class="col-md-10">
-					{{call?.description}}
+				<div class="col-md-10" [innerHtml]="call.description">
 				</div>
 			</div>
 			<div *ngIf="call?.operationId" class="row">
@@ -79,9 +78,7 @@
 							<div *ngIf="param.in" class="col-2">
 								<i>{{param.in}}</i>
 							</div>
-							<div *ngIf="param.description" class="col-10">
-								{{param.description}}
-							</div>
+							<div *ngIf="param.description" class="col-10" [innerHtml]="param.description"></div>
 						</div>
 						<div *ngIf="param.in==='body'" class="row">
 							<div class="col-2"></div>

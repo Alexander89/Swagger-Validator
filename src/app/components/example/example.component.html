@@ -23,7 +23,7 @@
 				<span *ngFor="let text of entry.info">{{text}}</span>
 			</span>
 		</div>
-		<div class="col-12 col-lg-7 col-xl-8 text-secondary">{{entry.description}}</div>
+		<div class="col-12 col-lg-7 col-xl-8 text-secondary" [innerHtml]="entry.description"></div>
 		<span class="d-none d-lg-block col-12">
 			<div *ngFor="let text of entry.info" class="row">
 				<div class="col-lg-5 col-xl-4">&nbsp;</div>
