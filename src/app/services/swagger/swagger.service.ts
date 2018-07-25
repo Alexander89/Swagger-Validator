@@ -211,7 +211,8 @@ export class Swagger {
 		const options = {
 			headers,
 			observe: 'response' as 'response',
-			reportProgress: false
+			reportProgress: false,
+			withCredentials: true
 		};
 
 		switch (call.method) {
