@@ -233,6 +233,17 @@ export class Swagger {
 					req.body,
 					options
 				);
+			case 'delete':
+				return this.httpClient.delete<any>(
+					req.src,
+					options
+				);
+			case 'patch':
+				return this.httpClient.patch<any>(
+					req.src,
+					req.body,
+					options
+				);
 		}
 	}
 	/**
